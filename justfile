@@ -1,5 +1,8 @@
 set windows-shell := ["powershell.exe", "-NoProfile", "-Command"]
 
+# Bun lives in the user profile; PS 5.1 PATH may not include it after login
+_bunpath := "$env:PATH = \"$env:USERPROFILE\\.bun\\bin;$env:PATH\""
+
 default:
     @just --list
 
@@ -13,13 +16,13 @@ test:
 
 # Ruff lint + format check
 lint:
-    uv run ruff check src/
-    uv run ruff format src/ --check
+    uv run ruff check src/ tests/
+    uv run ruff format src/ tests/ --check
 
 # Auto-fix lint issues
 fmt:
-    uv run ruff check src/ --fix
-    uv run ruff format src/
+    uv run ruff check src/ tests/ --fix
+    uv run ruff format src/ tests/
 
 # Pyright typecheck
 types:
@@ -27,24 +30,24 @@ types:
 
 # Webapp: TypeScript typecheck
 tsc:
-    cd webapp; bun run tsc --noEmit
+    {{_bunpath}}; cd webapp; bun run tsc --noEmit
 
 # Webapp: Biome check
 biome:
-    cd webapp; bunx biome check src/
+    {{_bunpath}}; cd webapp; bunx biome check src/
 
 # Playwright e2e (starts its own backend)
 e2e:
-    cd webapp; bunx playwright test
+    {{_bunpath}}; cd webapp; bunx playwright test
 
 # Local CI gate: lint + types + tests + tsc + biome
 ci:
-    uv run ruff check src/
-    uv run ruff format src/ --check
+    uv run ruff check src/ tests/
+    uv run ruff format src/ tests/ --check
     uv run pyright src/
     uv run pytest -q
-    cd webapp; bun run tsc --noEmit
-    cd webapp; bunx biome check src/
+    {{_bunpath}}; cd webapp; bun run tsc --noEmit
+    {{_bunpath}}; cd webapp; bunx biome check src/
 
 # Bundle for Claude Desktop (MCPB) - MUST wipe+recopy src -> mcpb/src first
 mcpb-pack:
@@ -56,4 +59,4 @@ build:
 
 # Quick stdio smoke test of the MCP server
 smoke:
-    uv run python -c "from gitee_mcp.server import mcp; print('tools:', len(mcp._tool_manager._tools))"
+    uv run python -c "import asyncio; from gitee_mcp.server_state import mcp; import gitee_mcp.tools; print('tools:', len(asyncio.run(mcp.list_tools())))"
