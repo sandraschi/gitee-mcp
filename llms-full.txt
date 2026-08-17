@@ -1,0 +1,162 @@
+# gitee-mcp - full documentation (LLM-readable)
+
+## Overview
+
+gitee-mcp is an MCP server bridging AI assistants to Gitee (gitee.com),
+China's largest Chinese-language code hosting platform (12M+ users, home of
+OpenHarmony, dromara/hutool, macrozheng/mall, RuoYi-Vue and much of China's
+OSS ecosystem). It provides a "humming radar" of live activity, repository
+intel, user and repo search, and Chinese-to-English translation via a local
+LLM with an honest dictionary fallback.
+
+Two access tiers:
+
+- Anonymous: repo details, README, languages, commits, branches, contents,
+  user search, user repos, humming radar. Rate limited to ~60 requests/hour
+  (cached 10 minutes).
+- Token (GITEE_TOKEN, free, no credit card): repo search, top-starred and
+  top-forked discovery, stargazer lists, higher limits.
+
+Verified platform constraints: Gitee explore/trending pages return HTTP 405
+to non-browser clients (anti-bot challenge) and are not scrapeable; the
+anonymous repo search endpoint returns an empty array. The server handles
+both honestly - the radar computes its own ranking from real repo data and
+token-gated operations return actionable auth_required errors instead of
+fake results.
+
+## Architecture
+
+- Backend: Python 3.11+, FastMCP 3.4.4+, FastAPI REST on 127.0.0.1:11161.
+  MCP streamable HTTP at /mcp (lifespan-chained per FastMCP 3.4.4).
+  Dual transport: stdio default; HTTP when MCP_PORT/PORT is set
+  (run_server.py entry).
+- Webapp: React 18 + Vite + TypeScript + Tailwind (dark) + Zustand + Lucide
+  + Framer Motion on 127.0.0.1:11162. Pages: Dashboard, Trending, Search,
+  Repo, Chat, Skills, Inbox, API Docs, Settings, Help, Logs.
+- The webapp and MCP tools share the same tool functions - no drift.
+- JsonCache under data/cache with TTL (default 600s) protects the
+  anonymous rate budget. X-RateLimit headers are tracked and surfaced.
+- Webhook receiver at POST /api/webhooks/gitee (X-Gitee-Token secret check)
+  appends to data/webhook_events.jsonl.
+
+## Tools
+
+### gitee_explore (discovery portmanteau)
+
+- humming: ranked live radar. Each repo: full_name, owner, html_url,
+  description (Chinese), translation (optional), language,
+  stargazers_count, forks_count, watchers_count, pushed_at,
+  activity_score, recent_commits (up to 5: sha, message, author, date).
+  Params: limit 1-50, language filter, translate bool.
+- top_starred / top_forked: token-tier repo search sorted by
+  stargazers_count / forks_count.
+- recommended: the configured seed list.
+- refresh: re-verifies seeds against the live API, reports dead seeds.
+
+### gitee_repo (intel portmanteau, all anonymous)
+
+- details: full metadata, pruned of heavy nested objects, normalized
+  html_url.
+- readme: decoded markdown, None when absent, truncated 60k chars.
+- languages: [{language, color, percent, bytes}].
+- commits: recent commits, limit 1-100.
+- contents: file/dir listing for a path.
+- branches: branch names.
+
+### gitee_search
+
+- users (anonymous): login, name, html_url, remark.
+- repos (token): keyword search, sort by stars/forks/updated/pushed.
+- user_repos (anonymous): public repos of a login sorted by push time.
+
+### gitee_translate
+
+- zh_to_en: local LLM translation (OpenAI-compatible chat completions,
+  temperature 0.2). Provider down -> built-in Chinese OSS glossary with
+  translated: false and a note. Never fakes a translation.
+- detect: CJK ratio check.
+- status: provider health, base URL, model.
+
+### gitee_webhook
+
+- list: recent events with one-line summaries.
+- clear: wipe the event store.
+
+### Prefab cards
+
+- show_gitee_humming_card: radar as rich in-chat card (plain text
+  fallback always included).
+- show_gitee_status_card: tier, rate limit, LLM health, model, seeds.
+
+### gitee_help
+
+Static documentation.
+
+## REST surface (11161)
+
+GET /api/health, /api/v1/diagnostics, /api/capabilities, /api/tools,
+/api/skills, /api/skills/{name}, /api/dashboard, /api/explore/humming,
+/api/repos/{owner}/{repo}/{surface}, /api/search/users, /api/search/repos,
+/api/translate/status, /api/webhooks/events, /api/logs,
+/api/llm/discover, /api/llm/providers; POST /api/translate,
+/api/llm/chat, /api/webhooks/gitee. /mcp for MCP streamable HTTP;
+/docs for Swagger UI.
+
+## The humming radar methodology
+
+Gitee has no public trending API, so the radar computes its own ranking
+from live data:
+
+1. Seed repos (curated defaults or GITEE_SEED_REPOS env).
+2. Live repo details + 10 most recent commits per seed (cached).
+3. activity_score = commit recency (decayed, up to 2.0 per commit within
+   24h) + commit volume (1.5 per recent commit) + stars (up to 3.0, capped
+   at 5000) + forks (up to 1.5, capped at 2000).
+4. Dead seeds (404) are dropped and reported in dead_seeds.
+5. Token tier additionally mixes in top-starred search results.
+
+## Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| GITEE_TOKEN | empty | Free token, unlocks search tier |
+| GITEE_API_BASE | https://gitee.com/api/v5 | v5 API base |
+| GITEE_WEBHOOK_SECRET | empty | Webhook receiver secret |
+| GITEE_LLM_BASE_URL | http://127.0.0.1:11434/v1 | Ollama/OpenAI-compatible |
+| GITEE_LLM_MODEL | qwen2.5:7b | Translation + chat model |
+| GITEE_CACHE_TTL | 600 | Cache TTL seconds |
+| GITEE_SEED_REPOS | curated list | Radar seeds, comma-separated |
+| GITEE_BACKEND_PORT | 11161 | Backend port |
+| GITEE_FRONTEND_PORT | 11162 | Webapp port |
+
+Default seeds: openharmony/openharmony, RuoYi-Vue/RuoYi-Vue,
+dromara/hutool, dromara/sa-token, dromara/RuoYi-Vue-Plus, apache/dubbo,
+seata/seata, JPressProjects/jpress, lyswhut/lx-music-desktop,
+SnailClimb/JavaGuide, macrozheng/mall, xuxueli/xxl-job,
+YunaiV/ruoyi-vue-pro, alibaba/nacos, spring-projects/spring-boot,
+mybatis/mybatis-3, apache/skywalking, apache/shardingsphere,
+apache/rocketmq, doocs/advanced-java, halo-dev/halo,
+baomidou/mybatis-plus, Tencent/APIJSON, pandao/editor.md, baidu/amis.
+
+## Error contract
+
+Tools return {success: bool}. Failures carry error (human-readable),
+error_type (not_found, auth_required, auth_invalid, rate_limited,
+network_error, validation) and suggestions (recovery steps).
+
+## Testing and gates
+
+- just ci: ruff check, ruff format --check, pyright, pytest, tsc --noEmit,
+  biome check.
+- pytest: 17 cases with declared respx HTTP doubles (no live network).
+- Playwright e2e: 12 cases (health, diagnostics, nav walk, radar, pages).
+- just mcpb-pack: wipes+recopies mcpb/src, verifies 3-4-100 prompts,
+  imports the staged entry, then packs.
+
+## Troubleshooting quick hits
+
+- auth_required: set GITEE_TOKEN, restart.
+- rate_limited: wait for the hourly window or token.
+- gloss instead of translation: start Ollama, ollama pull qwen2.5:7b.
+- webapp offline: backend on 11161 must run (start.bat).
+- timestamps +08:00: expected (China Standard Time).

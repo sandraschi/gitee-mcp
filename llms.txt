@@ -1,0 +1,31 @@
+# gitee-mcp
+
+Bridge to Gitee (gitee.com), China's largest open-source platform: humming radar, repo intel, search, zh->en translation.
+
+## Core
+
+- [README](README.md) - overview and quick start
+- [INSTALL](INSTALL.md) - all install methods
+- [docs/](docs/README.md) - full documentation stack
+- [llms-full.txt](llms-full.txt) - complete LLM-readable documentation
+
+## Tools
+
+- gitee_explore - humming radar, top-starred/top-forked, seeds
+- gitee_repo - details, readme, languages, commits, contents, branches
+- gitee_search - users (anonymous), repos (token), user repos
+- gitee_translate - zh->en via local LLM with gloss fallback
+- gitee_webhook - inbound event feed
+- show_gitee_humming_card / show_gitee_status_card - Prefab cards
+
+## Quick start
+
+```
+git clone https://github.com/sandraschi/gitee-mcp
+cd gitee-mcp && uv sync
+uv run python -m gitee_mcp.server        # stdio (Claude Desktop)
+./start.bat                              # full stack: backend 11161 + webapp 11162
+```
+
+Anonymous tier works out of the box. GITEE_TOKEN (free) unlocks repo search.
+Ollama enables full zh->en translation.

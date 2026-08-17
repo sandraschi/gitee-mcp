@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "gitee-mcp": {
+      "command": "python",
+      "args": ["-m", "gitee_mcp.server"],
+      "env": { "PYTHONPATH": "${workspaceFolder}/src" },
+      "capabilities": {
+        "tools": { "enabled": true },
+        "prompts": { "enabled": true },
+        "resources": { "enabled": true }
+      },
+      "metadata": {
+        "version": "0.1.0",
+        "tags": ["git", "china", "oss", "translation", "discovery"],
+        "homepage": "https://github.com/sandraschi/gitee-mcp"
+      }
+    }
+  }
+}

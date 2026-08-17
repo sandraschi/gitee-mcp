@@ -1,0 +1,1185 @@
+[
+  {
+    "name": "explore-radar-default",
+    "description": "gitee_explore humming (What is humming on Gitee right now?)",
+    "prompt": "What is humming on Gitee right now?",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "humming"
+    }
+  },
+  {
+    "name": "explore-radar-ten",
+    "description": "gitee_explore humming (Show the 10 most active repos on Gitee.)",
+    "prompt": "Show the 10 most active repos on Gitee.",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "humming",
+      "limit": 10
+    }
+  },
+  {
+    "name": "explore-radar-twenty-five",
+    "description": "gitee_explore humming (Give me the top 25 humming repos on Gitee.)",
+    "prompt": "Give me the top 25 humming repos on Gitee.",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "humming",
+      "limit": 25
+    }
+  },
+  {
+    "name": "explore-radar-python",
+    "description": "gitee_explore humming (Which Python projects are humming on Gitee?)",
+    "prompt": "Which Python projects are humming on Gitee?",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "humming",
+      "language": "Python"
+    }
+  },
+  {
+    "name": "explore-radar-java",
+    "description": "gitee_explore humming (Show me the most active Java repos on Gitee.)",
+    "prompt": "Show me the most active Java repos on Gitee.",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "humming",
+      "language": "Java"
+    }
+  },
+  {
+    "name": "explore-radar-go",
+    "description": "gitee_explore humming (What is hot in Go on Gitee?)",
+    "prompt": "What is hot in Go on Gitee?",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "humming",
+      "language": "Go"
+    }
+  },
+  {
+    "name": "explore-radar-rust",
+    "description": "gitee_explore humming (Any Rust repos humming on Gitee?)",
+    "prompt": "Any Rust repos humming on Gitee?",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "humming",
+      "language": "Rust"
+    }
+  },
+  {
+    "name": "explore-radar-ts",
+    "description": "gitee_explore humming (Which TypeScript projects are active on Gitee?)",
+    "prompt": "Which TypeScript projects are active on Gitee?",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "humming",
+      "language": "TypeScript"
+    }
+  },
+  {
+    "name": "explore-radar-translated",
+    "description": "gitee_explore humming (Show the humming radar and translate the descriptions.)",
+    "prompt": "Show the humming radar and translate the descriptions.",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "humming",
+      "translate": true
+    }
+  },
+  {
+    "name": "explore-radar-translated-five",
+    "description": "gitee_explore humming (Translate the top 5 Chinese repo descriptions on Gitee.)",
+    "prompt": "Translate the top 5 Chinese repo descriptions on Gitee.",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "humming",
+      "limit": 5,
+      "translate": true
+    }
+  },
+  {
+    "name": "explore-radar-recommended",
+    "description": "gitee_explore recommended (What are the recommended seed repos?)",
+    "prompt": "What are the recommended seed repos?",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "recommended"
+    }
+  },
+  {
+    "name": "explore-radar-refresh",
+    "description": "gitee_explore refresh (Refresh the Gitee radar seed list.)",
+    "prompt": "Refresh the Gitee radar seed list.",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "refresh"
+    }
+  },
+  {
+    "name": "explore-radar-top-starred",
+    "description": "gitee_explore top_starred (What are the top 15 most starred repos on Gitee?)",
+    "prompt": "What are the top 15 most starred repos on Gitee?",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "top_starred",
+      "limit": 15
+    }
+  },
+  {
+    "name": "explore-radar-top-forked",
+    "description": "gitee_explore top_forked (Show the most forked repos on Gitee.)",
+    "prompt": "Show the most forked repos on Gitee.",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "top_forked",
+      "limit": 10
+    }
+  },
+  {
+    "name": "explore-radar-small",
+    "description": "gitee_explore humming (Just the top 3 repos on Gitee right now.)",
+    "prompt": "Just the top 3 repos on Gitee right now.",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "humming",
+      "limit": 3
+    }
+  },
+  {
+    "name": "explore-radar-vue",
+    "description": "gitee_explore humming (Is anything Vue-related humming on Gitee?)",
+    "prompt": "Is anything Vue-related humming on Gitee?",
+    "tool": "gitee_explore",
+    "arguments": {
+      "operation": "humming",
+      "language": "Vue"
+    }
+  },
+  {
+    "name": "repo-hutool-details",
+    "description": "gitee_repo details dromara/hutool",
+    "prompt": "Profile dromara/hutool.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "dromara",
+      "repo": "hutool"
+    }
+  },
+  {
+    "name": "repo-mall-details",
+    "description": "gitee_repo details macrozheng/mall",
+    "prompt": "Give me a full profile of macrozheng/mall.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "macrozheng",
+      "repo": "mall"
+    }
+  },
+  {
+    "name": "repo-xxl-job-details",
+    "description": "gitee_repo details xuxueli/xxl-job",
+    "prompt": "What can you tell me about xuxueli/xxl-job?",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "xuxueli",
+      "repo": "xxl-job"
+    }
+  },
+  {
+    "name": "repo-JavaGuide-details",
+    "description": "gitee_repo details SnailClimb/JavaGuide",
+    "prompt": "Profile SnailClimb/JavaGuide.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "SnailClimb",
+      "repo": "JavaGuide"
+    }
+  },
+  {
+    "name": "repo-dubbo-details",
+    "description": "gitee_repo details apache/dubbo",
+    "prompt": "Show details of apache/dubbo.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "apache",
+      "repo": "dubbo"
+    }
+  },
+  {
+    "name": "repo-seata-details",
+    "description": "gitee_repo details seata/seata",
+    "prompt": "What is seata/seata?",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "seata",
+      "repo": "seata"
+    }
+  },
+  {
+    "name": "repo-nacos-details",
+    "description": "gitee_repo details alibaba/nacos",
+    "prompt": "Profile alibaba/nacos.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "alibaba",
+      "repo": "nacos"
+    }
+  },
+  {
+    "name": "repo-halo-details",
+    "description": "gitee_repo details halo-dev/halo",
+    "prompt": "Tell me about halo-dev/halo.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "halo-dev",
+      "repo": "halo"
+    }
+  },
+  {
+    "name": "repo-lx-music-details",
+    "description": "gitee_repo details lyswhut/lx-music-desktop",
+    "prompt": "What is lyswhut/lx-music-desktop?",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "lyswhut",
+      "repo": "lx-music-desktop"
+    }
+  },
+  {
+    "name": "repo-openharmony-details",
+    "description": "gitee_repo details openharmony/openharmony",
+    "prompt": "Profile openharmony/openharmony.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "openharmony",
+      "repo": "openharmony"
+    }
+  },
+  {
+    "name": "repo-ruoyi-details",
+    "description": "gitee_repo details RuoYi-Vue/RuoYi-Vue",
+    "prompt": "Show details of RuoYi-Vue/RuoYi-Vue.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "RuoYi-Vue",
+      "repo": "RuoYi-Vue"
+    }
+  },
+  {
+    "name": "repo-mybatis-plus-details",
+    "description": "gitee_repo details baomidou/mybatis-plus",
+    "prompt": "Profile baomidou/mybatis-plus.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "baomidou",
+      "repo": "mybatis-plus"
+    }
+  },
+  {
+    "name": "repo-skywalking-details",
+    "description": "gitee_repo details apache/skywalking",
+    "prompt": "What is apache/skywalking?",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "apache",
+      "repo": "skywalking"
+    }
+  },
+  {
+    "name": "repo-shardingsphere-details",
+    "description": "gitee_repo details apache/shardingsphere",
+    "prompt": "Show details of apache/shardingsphere.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "apache",
+      "repo": "shardingsphere"
+    }
+  },
+  {
+    "name": "repo-rocketmq-details",
+    "description": "gitee_repo details apache/rocketmq",
+    "prompt": "Profile apache/rocketmq.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "apache",
+      "repo": "rocketmq"
+    }
+  },
+  {
+    "name": "repo-advanced-java-details",
+    "description": "gitee_repo details doocs/advanced-java",
+    "prompt": "What is doocs/advanced-java?",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "doocs",
+      "repo": "advanced-java"
+    }
+  },
+  {
+    "name": "repo-jpress-details",
+    "description": "gitee_repo details JPressProjects/jpress",
+    "prompt": "Profile JPressProjects/jpress.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "JPressProjects",
+      "repo": "jpress"
+    }
+  },
+  {
+    "name": "repo-amis-details",
+    "description": "gitee_repo details baidu/amis",
+    "prompt": "What is baidu/amis?",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "baidu",
+      "repo": "amis"
+    }
+  },
+  {
+    "name": "repo-editor-md-details",
+    "description": "gitee_repo details pandao/editor.md",
+    "prompt": "Show details of pandao/editor.md.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "pandao",
+      "repo": "editor.md"
+    }
+  },
+  {
+    "name": "repo-sa-token-details",
+    "description": "gitee_repo details dromara/sa-token",
+    "prompt": "Profile dromara/sa-token.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "dromara",
+      "repo": "sa-token"
+    }
+  },
+  {
+    "name": "repo-hutool-readme",
+    "description": "gitee_repo readme dromara/hutool",
+    "prompt": "Summarize the README of dromara/hutool.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "readme",
+      "owner": "dromara",
+      "repo": "hutool"
+    }
+  },
+  {
+    "name": "repo-mall-readme",
+    "description": "gitee_repo readme macrozheng/mall",
+    "prompt": "What does the macrozheng/mall README say?",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "readme",
+      "owner": "macrozheng",
+      "repo": "mall"
+    }
+  },
+  {
+    "name": "repo-JavaGuide-readme",
+    "description": "gitee_repo readme SnailClimb/JavaGuide",
+    "prompt": "Summarize SnailClimb/JavaGuide README for me.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "readme",
+      "owner": "SnailClimb",
+      "repo": "JavaGuide"
+    }
+  },
+  {
+    "name": "repo-ruoyi-readme",
+    "description": "gitee_repo readme RuoYi-Vue/RuoYi-Vue",
+    "prompt": "Read the README of RuoYi-Vue/RuoYi-Vue.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "readme",
+      "owner": "RuoYi-Vue",
+      "repo": "RuoYi-Vue"
+    }
+  },
+  {
+    "name": "repo-dubbo-readme",
+    "description": "gitee_repo readme apache/dubbo",
+    "prompt": "Show me the apache/dubbo README highlights.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "readme",
+      "owner": "apache",
+      "repo": "dubbo"
+    }
+  },
+  {
+    "name": "repo-hutool-langs",
+    "description": "gitee_repo languages dromara/hutool",
+    "prompt": "Language breakdown of dromara/hutool?",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "languages",
+      "owner": "dromara",
+      "repo": "hutool"
+    }
+  },
+  {
+    "name": "repo-mall-langs",
+    "description": "gitee_repo languages macrozheng/mall",
+    "prompt": "Which languages in macrozheng/mall?",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "languages",
+      "owner": "macrozheng",
+      "repo": "mall"
+    }
+  },
+  {
+    "name": "repo-openharmony-langs",
+    "description": "gitee_repo languages openharmony/openharmony",
+    "prompt": "Language mix of openharmony/openharmony.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "languages",
+      "owner": "openharmony",
+      "repo": "openharmony"
+    }
+  },
+  {
+    "name": "repo-seata-langs",
+    "description": "gitee_repo languages seata/seata",
+    "prompt": "Languages used in seata/seata.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "languages",
+      "owner": "seata",
+      "repo": "seata"
+    }
+  },
+  {
+    "name": "repo-hutool-commits",
+    "description": "gitee_repo commits dromara/hutool",
+    "prompt": "Recent commits in dromara/hutool.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "commits",
+      "owner": "dromara",
+      "repo": "hutool",
+      "limit": 10
+    }
+  },
+  {
+    "name": "repo-xxl-job-commits",
+    "description": "gitee_repo commits xuxueli/xxl-job",
+    "prompt": "Last 5 commits in xuxueli/xxl-job.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "commits",
+      "owner": "xuxueli",
+      "repo": "xxl-job",
+      "limit": 5
+    }
+  },
+  {
+    "name": "repo-skywalking-commits",
+    "description": "gitee_repo commits apache/skywalking",
+    "prompt": "What did apache/skywalking commit recently?",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "commits",
+      "owner": "apache",
+      "repo": "skywalking",
+      "limit": 8
+    }
+  },
+  {
+    "name": "repo-mall-commits",
+    "description": "gitee_repo commits macrozheng/mall",
+    "prompt": "Show the 3 newest commits in macrozheng/mall.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "commits",
+      "owner": "macrozheng",
+      "repo": "mall",
+      "limit": 3
+    }
+  },
+  {
+    "name": "repo-hutool-contents",
+    "description": "gitee_repo contents dromara/hutool",
+    "prompt": "Top-level files of dromara/hutool.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "contents",
+      "owner": "dromara",
+      "repo": "hutool"
+    }
+  },
+  {
+    "name": "repo-advanced-java-contents",
+    "description": "gitee_repo contents doocs/advanced-java",
+    "prompt": "List docs folder of doocs/advanced-java.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "contents",
+      "owner": "doocs",
+      "repo": "advanced-java",
+      "path": "docs"
+    }
+  },
+  {
+    "name": "repo-ruoyi-contents",
+    "description": "gitee_repo contents YunaiV/ruoyi-vue-pro",
+    "prompt": "What is in the root of YunaiV/ruoyi-vue-pro?",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "contents",
+      "owner": "YunaiV",
+      "repo": "ruoyi-vue-pro"
+    }
+  },
+  {
+    "name": "repo-dubbo-branches",
+    "description": "gitee_repo branches apache/dubbo",
+    "prompt": "Branches of apache/dubbo.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "branches",
+      "owner": "apache",
+      "repo": "dubbo"
+    }
+  },
+  {
+    "name": "repo-nacos-branches",
+    "description": "gitee_repo branches alibaba/nacos",
+    "prompt": "Which branches does alibaba/nacos have?",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "branches",
+      "owner": "alibaba",
+      "repo": "nacos"
+    }
+  },
+  {
+    "name": "repo-hutool-commits-20",
+    "description": "gitee_repo commits dromara/hutool",
+    "prompt": "20 recent commits in dromara/hutool.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "commits",
+      "owner": "dromara",
+      "repo": "hutool",
+      "limit": 20
+    }
+  },
+  {
+    "name": "repo-editor-md-contents",
+    "description": "gitee_repo contents pandao/editor.md",
+    "prompt": "Contents of pandao/editor.md.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "contents",
+      "owner": "pandao",
+      "repo": "editor.md"
+    }
+  },
+  {
+    "name": "repo-amis-langs",
+    "description": "gitee_repo languages baidu/amis",
+    "prompt": "Language mix of baidu/amis.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "languages",
+      "owner": "baidu",
+      "repo": "amis"
+    }
+  },
+  {
+    "name": "repo-rocketmq-readme",
+    "description": "gitee_repo readme apache/rocketmq",
+    "prompt": "README summary of apache/rocketmq.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "readme",
+      "owner": "apache",
+      "repo": "rocketmq"
+    }
+  },
+  {
+    "name": "repo-mybatis-plus-details",
+    "description": "gitee_repo details baomidou/mybatis-plus",
+    "prompt": "Profile baomidou/mybatis-plus again with license info.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "details",
+      "owner": "baomidou",
+      "repo": "mybatis-plus"
+    }
+  },
+  {
+    "name": "repo-sa-token-commits",
+    "description": "gitee_repo commits dromara/sa-token",
+    "prompt": "Recent commits in dromara/sa-token.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "commits",
+      "owner": "dromara",
+      "repo": "sa-token",
+      "limit": 6
+    }
+  },
+  {
+    "name": "repo-halo-commits",
+    "description": "gitee_repo commits halo-dev/halo",
+    "prompt": "What has halo-dev/halo committed lately?",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "commits",
+      "owner": "halo-dev",
+      "repo": "halo",
+      "limit": 5
+    }
+  },
+  {
+    "name": "repo-advanced-java-readme",
+    "description": "gitee_repo readme doocs/advanced-java",
+    "prompt": "Summarize doocs/advanced-java README.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "readme",
+      "owner": "doocs",
+      "repo": "advanced-java"
+    }
+  },
+  {
+    "name": "repo-skywalking-langs",
+    "description": "gitee_repo languages apache/skywalking",
+    "prompt": "Language breakdown of apache/skywalking.",
+    "tool": "gitee_repo",
+    "arguments": {
+      "operation": "languages",
+      "owner": "apache",
+      "repo": "skywalking"
+    }
+  },
+  {
+    "name": "search-users-sandra",
+    "description": "gitee_search users (Find the Gitee user 'sandra'.)",
+    "prompt": "Find the Gitee user 'sandra'.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "users",
+      "query": "sandra"
+    }
+  },
+  {
+    "name": "search-users-macrozheng",
+    "description": "gitee_search users (Search Gitee for user macrozheng.)",
+    "prompt": "Search Gitee for user macrozheng.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "users",
+      "query": "macrozheng"
+    }
+  },
+  {
+    "name": "search-users-jackson",
+    "description": "gitee_search users (Find users named Jackson on Gitee.)",
+    "prompt": "Find users named Jackson on Gitee.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "users",
+      "query": "jackson"
+    }
+  },
+  {
+    "name": "search-users-hutool",
+    "description": "gitee_search users (Is there a Gitee user called hutool?)",
+    "prompt": "Is there a Gitee user called hutool?",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "users",
+      "query": "hutool"
+    }
+  },
+  {
+    "name": "search-users-openharmony",
+    "description": "gitee_search users (Find the openharmony organization account.)",
+    "prompt": "Find the openharmony organization account.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "users",
+      "query": "openharmony"
+    }
+  },
+  {
+    "name": "search-repos-lowcode",
+    "description": "gitee_search repos (Search Gitee repos for low code platforms.)",
+    "prompt": "Search Gitee repos for low code platforms.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "repos",
+      "query": "low code",
+      "sort": "stargazers_count"
+    }
+  },
+  {
+    "name": "search-repos-vue3",
+    "description": "gitee_search repos (Find Vue 3 admin frameworks on Gitee.)",
+    "prompt": "Find Vue 3 admin frameworks on Gitee.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "repos",
+      "query": "vue3 admin"
+    }
+  },
+  {
+    "name": "search-repos-fastmcp",
+    "description": "gitee_search repos (Is fastmcp available on Gitee?)",
+    "prompt": "Is fastmcp available on Gitee?",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "repos",
+      "query": "fastmcp"
+    }
+  },
+  {
+    "name": "search-repos-ml",
+    "description": "gitee_search repos (Search Gitee for machine learning projects.)",
+    "prompt": "Search Gitee for machine learning projects.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "repos",
+      "query": "machine learning",
+      "sort": "forks_count"
+    }
+  },
+  {
+    "name": "search-repos-chatgpt",
+    "description": "gitee_search repos (Gitee repos about ChatGPT.)",
+    "prompt": "Gitee repos about ChatGPT.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "repos",
+      "query": "chatgpt",
+      "sort": "updated"
+    }
+  },
+  {
+    "name": "search-repos-springboot",
+    "description": "gitee_search repos (SpringBoot starter projects on Gitee.)",
+    "prompt": "SpringBoot starter projects on Gitee.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "repos",
+      "query": "springboot"
+    }
+  },
+  {
+    "name": "search-repos-iot",
+    "description": "gitee_search repos (IoT platforms hosted on Gitee.)",
+    "prompt": "IoT platforms hosted on Gitee.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "repos",
+      "query": "物联网",
+      "sort": "stargazers_count"
+    }
+  },
+  {
+    "name": "search-repos-admin",
+    "description": "gitee_search repos (Admin dashboards on Gitee.)",
+    "prompt": "Admin dashboards on Gitee.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "repos",
+      "query": "admin"
+    }
+  },
+  {
+    "name": "search-repos-whatsnew",
+    "description": "gitee_search repos (Recently updated repos about RAG on Gitee.)",
+    "prompt": "Recently updated repos about RAG on Gitee.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "repos",
+      "query": "rag",
+      "sort": "pushed"
+    }
+  },
+  {
+    "name": "search-repos-kotlin",
+    "description": "gitee_search repos (Kotlin projects on Gitee.)",
+    "prompt": "Kotlin projects on Gitee.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "repos",
+      "query": "kotlin"
+    }
+  },
+  {
+    "name": "search-user-repos-macrozheng",
+    "description": "gitee_search user_repos (Public repos of macrozheng.)",
+    "prompt": "Public repos of macrozheng.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "user_repos",
+      "query": "",
+      "login": "macrozheng"
+    }
+  },
+  {
+    "name": "search-user-repos-snailclimb",
+    "description": "gitee_search user_repos (What repos does SnailClimb have?)",
+    "prompt": "What repos does SnailClimb have?",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "user_repos",
+      "query": "",
+      "login": "SnailClimb"
+    }
+  },
+  {
+    "name": "search-user-repos-lyswhut",
+    "description": "gitee_search user_repos (List lyswhut's public repos.)",
+    "prompt": "List lyswhut's public repos.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "user_repos",
+      "query": "",
+      "login": "lyswhut"
+    }
+  },
+  {
+    "name": "search-user-repos-yunaiv",
+    "description": "gitee_search user_repos (Repos by YunaiV on Gitee.)",
+    "prompt": "Repos by YunaiV on Gitee.",
+    "tool": "gitee_search",
+    "arguments": {
+      "operation": "user_repos",
+      "query": "",
+      "login": "YunaiV"
+    }
+  },
+  {
+    "name": "translate-zh-00",
+    "description": "Translate Chinese OSS term: enterprise microservices framework",
+    "prompt": "Translate this to English: 企业级微服务快速开发框架",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "企业级微服务快速开发框架"
+    }
+  },
+  {
+    "name": "translate-zh-01",
+    "description": "Translate Chinese OSS term: SpringBoot+MyBatis e-commerce system",
+    "prompt": "Translate this to English: 一套基于SpringBoot+MyBatis的电商系统",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "一套基于SpringBoot+MyBatis的电商系统"
+    }
+  },
+  {
+    "name": "translate-zh-02",
+    "description": "Translate Chinese OSS term: high performance distributed cache",
+    "prompt": "Translate this to English: 高性能分布式缓存系统",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "高性能分布式缓存系统"
+    }
+  },
+  {
+    "name": "translate-zh-03",
+    "description": "Translate Chinese OSS term: low-code platform with drag-and-drop admin generation",
+    "prompt": "Translate this to English: 低代码开发平台，拖拽式生成管理后台",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "低代码开发平台，拖拽式生成管理后台"
+    }
+  },
+  {
+    "name": "translate-zh-04",
+    "description": "Translate Chinese OSS term: open-source IoT platform with device management",
+    "prompt": "Translate this to English: 开源物联网平台，支持设备接入与管理",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "开源物联网平台，支持设备接入与管理"
+    }
+  },
+  {
+    "name": "translate-zh-05",
+    "description": "Translate Chinese OSS term: auth framework with multi-tenant and OAuth2",
+    "prompt": "Translate this to English: 安全认证框架，支持多租户与OAuth2",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "安全认证框架，支持多租户与OAuth2"
+    }
+  },
+  {
+    "name": "translate-zh-06",
+    "description": "Translate Chinese OSS term: lightweight job scheduling platform",
+    "prompt": "Translate this to English: 轻量级任务调度平台",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "轻量级任务调度平台"
+    }
+  },
+  {
+    "name": "translate-zh-07",
+    "description": "Translate Chinese OSS term: all-in-one DevOps platform",
+    "prompt": "Translate this to English: 一站式 DevOps 平台",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "一站式 DevOps 平台"
+    }
+  },
+  {
+    "name": "translate-zh-08",
+    "description": "Translate Chinese OSS term: automatic API documentation generator",
+    "prompt": "Translate this to English: 接口文档自动生成工具",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "接口文档自动生成工具"
+    }
+  },
+  {
+    "name": "translate-zh-09",
+    "description": "Translate Chinese OSS term: online code hosting platform",
+    "prompt": "Translate this to English: 在线代码托管平台",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "在线代码托管平台"
+    }
+  },
+  {
+    "name": "translate-zh-10",
+    "description": "Translate Chinese OSS term: distributed transaction solution",
+    "prompt": "Translate this to English: 分布式事务解决方案",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "分布式事务解决方案"
+    }
+  },
+  {
+    "name": "translate-zh-11",
+    "description": "Translate Chinese OSS term: intelligent ops monitoring and alerting system",
+    "prompt": "Translate this to English: 智能运维监控告警系统",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "智能运维监控告警系统"
+    }
+  },
+  {
+    "name": "translate-zh-12",
+    "description": "Translate Chinese OSS term: real-time message push service",
+    "prompt": "Translate this to English: 实时消息推送服务",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "实时消息推送服务"
+    }
+  },
+  {
+    "name": "translate-zh-13",
+    "description": "Translate Chinese OSS term: LLM-based intelligent Q&A assistant",
+    "prompt": "Translate this to English: 基于大模型的智能问答助手",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "基于大模型的智能问答助手"
+    }
+  },
+  {
+    "name": "translate-zh-14",
+    "description": "Translate Chinese OSS term: frontend-backend separated admin system",
+    "prompt": "Translate this to English: 前后端分离的后台管理系统",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "前后端分离的后台管理系统"
+    }
+  },
+  {
+    "name": "translate-zh-15",
+    "description": "Translate Chinese OSS term: microservice scaffolding for rapid development",
+    "prompt": "Translate this to English: 快速构建微服务的脚手架",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "快速构建微服务的脚手架"
+    }
+  },
+  {
+    "name": "translate-zh-16",
+    "description": "Translate Chinese OSS term: enterprise workflow engine",
+    "prompt": "Translate this to English: 企业级工作流引擎",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "企业级工作流引擎"
+    }
+  },
+  {
+    "name": "translate-zh-17",
+    "description": "Translate Chinese OSS term: visual data dashboard",
+    "prompt": "Translate this to English: 可视化数据大屏",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "可视化数据大屏"
+    }
+  },
+  {
+    "name": "translate-zh-18",
+    "description": "Translate Chinese OSS term: high-concurrency flash-sale example",
+    "prompt": "Translate this to English: 高并发秒杀系统示例",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "高并发秒杀系统示例"
+    }
+  },
+  {
+    "name": "translate-zh-19",
+    "description": "Translate Chinese OSS term: container orchestration and management platform",
+    "prompt": "Translate this to English: 容器编排与管理平台",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "容器编排与管理平台"
+    }
+  },
+  {
+    "name": "translate-generic",
+    "description": "Translate a Chinese repo description",
+    "prompt": "Translate this repo description to English: 一套基于微服务的电商中台系统",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "zh_to_en",
+      "text": "一套基于微服务的电商中台系统"
+    }
+  },
+  {
+    "name": "translate-detect-zh",
+    "description": "Detect Chinese text",
+    "prompt": "Does this contain Chinese: 高并发分布式系统?",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "detect",
+      "text": "高并发分布式系统"
+    }
+  },
+  {
+    "name": "translate-detect-en",
+    "description": "Detect English text",
+    "prompt": "Is 'microservices framework' Chinese?",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "detect",
+      "text": "microservices framework"
+    }
+  },
+  {
+    "name": "translate-status",
+    "description": "Translation provider status",
+    "prompt": "Is the translation service up?",
+    "tool": "gitee_translate",
+    "arguments": {
+      "operation": "status"
+    }
+  },
+  {
+    "name": "webhook-list",
+    "description": "List recent webhook events",
+    "prompt": "What webhook events came in recently?",
+    "tool": "gitee_webhook",
+    "arguments": {
+      "operation": "list",
+      "limit": 20
+    }
+  },
+  {
+    "name": "webhook-list-5",
+    "description": "Last 5 webhook events",
+    "prompt": "Show the last 5 webhook events.",
+    "tool": "gitee_webhook",
+    "arguments": {
+      "operation": "list",
+      "limit": 5
+    }
+  },
+  {
+    "name": "webhook-clear",
+    "description": "Clear webhook history",
+    "prompt": "Clear the webhook event history.",
+    "tool": "gitee_webhook",
+    "arguments": {
+      "operation": "clear"
+    }
+  },
+  {
+    "name": "card-humming",
+    "description": "Humming radar as a card",
+    "prompt": "Show the Gitee humming radar card.",
+    "tool": "show_gitee_humming_card",
+    "arguments": {
+      "limit": 8
+    }
+  },
+  {
+    "name": "card-humming-translate",
+    "description": "Humming radar card with translations",
+    "prompt": "Show the top 5 Gitee repos as a card, translated.",
+    "tool": "show_gitee_humming_card",
+    "arguments": {
+      "limit": 5,
+      "translate": true
+    }
+  },
+  {
+    "name": "card-status",
+    "description": "Server status card",
+    "prompt": "Show the gitee-mcp status card.",
+    "tool": "show_gitee_status_card",
+    "arguments": {}
+  },
+  {
+    "name": "help-overview",
+    "description": "Server help",
+    "prompt": "What can you do with Gitee?",
+    "tool": "gitee_help",
+    "arguments": {}
+  }
+]

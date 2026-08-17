@@ -1,0 +1,29 @@
+{
+  "manifest_version": "0.2",
+  "name": "gitee-mcp",
+  "version": "0.1.0",
+  "description": "Gitee (Chinese GitHub) bridge - trending radar, repo intel, user/repo search and zh->en translation via local LLM",
+  "author": { "name": "Sandra Schipal" },
+  "server": {
+    "type": "python",
+    "entry_point": "src/gitee_mcp/server.py",
+    "mcp_config": {
+      "command": "python",
+      "args": ["-m", "gitee_mcp.server"],
+      "env": {
+        "PYTHONPATH": "${PWD}/src",
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  },
+  "tools": [
+    { "name": "gitee_explore", "description": "Humming radar, top-starred/top-forked discovery, seed management" },
+    { "name": "gitee_repo", "description": "Repo details, readme, languages, commits, contents, branches" },
+    { "name": "gitee_search", "description": "Search users, repositories, user repos" },
+    { "name": "gitee_translate", "description": "Chinese to English translation via local LLM with gloss fallback" },
+    { "name": "gitee_webhook", "description": "Inbound Gitee webhook event feed" },
+    { "name": "gitee_help", "description": "Server help and configuration reference" },
+    { "name": "show_gitee_humming_card", "description": "Humming radar as a rich Prefab card" },
+    { "name": "show_gitee_status_card", "description": "Server configuration status as a rich Prefab card" }
+  ]
+}

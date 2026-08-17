@@ -1,0 +1,8 @@
+# Cursor rules for gitee-mcp
+
+- Backend: FastMCP 3.4.4+, portmanteau tools, `uv run python` only
+- Never fake data: anonymous repo search -> auth_required error
+- Radar uses real live commits/stars; Gitee trending is unscrapable
+- `just ci` before merge; ASCII-only scripts; no em dashes anywhere
+- One .env at repo root; secrets never in code
+- GITEE_TOKEN unlocks the search tier (free token, no CC)
