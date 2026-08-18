@@ -76,14 +76,11 @@ def _enrich(repo: dict, translate: bool) -> dict:
     return out
 
 
-def _fetch_seed(owner: str, repo: str, translate: bool) -> dict | None:
+def _fetch_seed(owner: str, repo: str, translate: bool) -> dict:
+    """Fetch a seed's details + commits; raises GiteeError on failure (caller classifies)."""
     client = get_client()
-    try:
-        details = client.repo_details(owner, repo)
-        commits = client.repo_commits(owner, repo, limit=10)
-    except GiteeError as exc:
-        logger.warning("Seed %s/%s failed: %s", owner, repo, exc.message)
-        return None
+    details = client.repo_details(owner, repo)
+    commits = client.repo_commits(owner, repo, limit=10)
     enriched = _enrich(details, translate)
     enriched["activity_score"] = activity_score(details, commits)
     enriched["recent_commits"] = [
@@ -98,6 +95,15 @@ def _fetch_seed(owner: str, repo: str, translate: bool) -> dict | None:
     return enriched
 
 
+def _seed_error_kind(exc: GiteeError) -> str:
+    """Classify a seed fetch failure: rate-limited vs dead (404) vs other."""
+    if exc.error_type == "rate_limited" or exc.status in (403, 429):
+        return "throttled"
+    if exc.error_type == "not_found":
+        return "dead"
+    return "other"
+
+
 def humming_radar(
     limit: int = 20,
     language: str = "",
@@ -109,14 +115,44 @@ def humming_radar(
     seeds = settings.seed_repos
     results: list[dict] = []
     dead: list[str] = []
+    throttled: list[str] = []
+    other_failures: list[str] = []
+
+    # Anonymous quota exhausted? Do not burn the window with doomed requests -
+    # report the honest throttled state immediately instead.
+    if client.rate_limit_remaining == 0 and not client.cfg.token:
+        return {
+            "success": True,
+            "message": (
+                "Gitee anonymous rate limit exhausted (0/60 for this hour). "
+                "Wait for the window to reset or set GITEE_TOKEN for the full tier."
+            ),
+            "data": {
+                "repos": [],
+                "total": 0,
+                "dead_seeds": [],
+                "throttled_seeds": list(seeds),
+                "rate_limited": True,
+                "tier": "anonymous",
+                "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            },
+        }
 
     for seed in seeds:
         if "/" not in seed:
             continue
         owner, repo = seed.split("/", 1)
-        item = _fetch_seed(owner.strip(), repo.strip(), translate)
-        if item is None:
-            dead.append(seed)
+        try:
+            item = _fetch_seed(owner.strip(), repo.strip(), translate)
+        except GiteeError as exc:
+            kind = _seed_error_kind(exc)
+            if kind == "throttled":
+                throttled.append(seed)
+            elif kind == "dead":
+                dead.append(seed)
+            else:
+                other_failures.append(seed)
+            logger.warning("Seed %s skipped: %s", seed, exc.message)
             continue
         if language and (item["language"] or "").lower() != language.lower():
             continue
@@ -137,13 +173,20 @@ def humming_radar(
             logger.warning("Token mix skipped: %s", exc.message)
 
     results.sort(key=lambda r: r.get("activity_score", 0), reverse=True)
+    message = f"Humming radar: {len(results)} repos"
+    if throttled:
+        message += f", {len(throttled)} seeds throttled by the anonymous rate limit"
+    if dead:
+        message += f", {len(dead)} dead seeds dropped"
     return {
         "success": True,
-        "message": f"Humming radar: {len(results)} repos, {len(dead)} dead seeds dropped",
+        "message": message,
         "data": {
             "repos": results[: max(limit, 1)],
             "total": len(results),
             "dead_seeds": dead,
+            "throttled_seeds": throttled,
+            "rate_limited": bool(throttled),
             "tier": "token" if client.cfg.token else "anonymous",
             "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         },

@@ -120,12 +120,38 @@ if (-not $NoBrowser -and -not $Headless) {
     }
 }
 
-# --- Keep alive --------------------------------------------------------------------
+# --- Keep alive: log to file, auto-restart the backend on crash ---------------
+$LogDir = Join-Path $Root "data"
+New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
+$BackendLog = Join-Path $LogDir "backend.log"
+$Restarts = 0
+$MaxRestarts = 5
 while ($true) {
     if ($BackendJob.State -in @("Completed", "Failed")) {
-        Write-Host "Backend exited - restarting..." -ForegroundColor Red
-        Receive-Job $BackendJob | Out-String | Write-Host
-        break
+        Receive-Job $BackendJob -Keep | Out-String | Add-Content $BackendLog
+        if ($Restarts -ge $MaxRestarts) {
+            Write-Host "Backend exited $MaxRestarts times - giving up. See $BackendLog" -ForegroundColor Red
+            break
+        }
+        $Restarts++
+        Write-Host "  backend exited - restarting (attempt $Restarts/$MaxRestarts)..." -ForegroundColor Yellow
+        $BackendJob = Start-Job -Name "gitee-backend-$Restarts" -ScriptBlock {
+            param($Root, $Port)
+            Set-Location $Root
+            uv run uvicorn gitee_mcp.server:app --host 127.0.0.1 --port $Port --log-level info
+        } -ArgumentList $Root, $BackendPort
+        # wait for health again
+        $ready = $false
+        for ($i = 0; $i -lt 60; $i++) {
+            try {
+                $r = Invoke-WebRequest -Uri "http://127.0.0.1:$BackendPort/api/health" -TimeoutSec 2 -UseBasicParsing -ErrorAction SilentlyContinue
+                if ($r.StatusCode -eq 200) { $ready = $true; break }
+            } catch { }
+            Start-Sleep -Seconds 1
+        }
+        if ($ready) {
+            Write-Host "  backend healthy again" -ForegroundColor Green
+        }
     }
     Start-Sleep -Seconds 2
 }

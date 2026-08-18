@@ -40,6 +40,25 @@ test.describe("Fleet Audit", () => {
     await expect(page.locator('[data-testid="onboarding-cue"]')).toBeVisible();
   });
 
+  test("Tailwind CSS is applied (dark theme, flex layout)", async ({ page }) => {
+    // Regression lock: missing tailwind/postcss config ships unstyled HTML that
+    // passes DOM assertions but looks completely broken (2026-08-18).
+    await page.goto(FE);
+    const styles = await page.evaluate(() => {
+      const body = getComputedStyle(document.body);
+      const nav = document.querySelector("nav a");
+      const aside = document.querySelector("aside");
+      return {
+        bodyBg: body.backgroundColor,
+        navFlex: nav ? getComputedStyle(nav).display : "",
+        sidebarWidth: aside ? getComputedStyle(aside).width : "",
+      };
+    });
+    expect(styles.bodyBg).toBe("rgb(9, 9, 11)"); // zinc-950 dark
+    expect(styles.navFlex).toBe("flex");
+    expect(parseFloat(styles.sidebarWidth)).toBeGreaterThan(100);
+  });
+
   test("Trending radar loads live repos", async ({ page }) => {
     await page.goto(`${FE}/trending`);
     await expect(page.locator('[data-testid="trending-page"]')).toBeVisible();

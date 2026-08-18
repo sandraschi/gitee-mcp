@@ -1,5 +1,5 @@
 import { type RadarRepo, type RadarResponse, api } from "@/lib/api";
-import { GitCommitHorizontal, GitFork, Languages, Star } from "lucide-react";
+import { GitCommitHorizontal, GitFork, Languages, Star, TriangleAlert } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -23,6 +23,7 @@ export default function Trending() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [rateLimited, setRateLimited] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -33,6 +34,7 @@ export default function Trending() {
       const res = await api<RadarResponse>(`/api/explore/humming?${q}`);
       setRepos(res.data.repos);
       setMessage(res.message);
+      setRateLimited(!!res.data.rate_limited);
     } catch (e) {
       setError(e instanceof Error ? e.message : "failed to load radar");
     } finally {
@@ -81,6 +83,24 @@ export default function Trending() {
       </div>
 
       {message && <p className="mt-2 text-xs text-zinc-500">{message}</p>}
+      {rateLimited && (
+        <div
+          data-testid="rate-limit-banner"
+          className="mt-3 flex items-start gap-2 rounded-lg border border-amber-500/50 bg-amber-500/10 p-3 text-sm text-amber-300"
+        >
+          <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>
+            Gitee's anonymous quota (60 requests/hour) is exhausted for this hour - the radar is
+            temporarily empty. Wait for the window to reset, or set a free{" "}
+            <code className="rounded bg-zinc-800 px-1">GITEE_TOKEN</code> in{" "}
+            <code className="rounded bg-zinc-800 px-1">.env</code> for the full tier - see{" "}
+            <Link to="/settings" className="text-amber-400 hover:underline">
+              Settings
+            </Link>
+            .
+          </span>
+        </div>
+      )}
       {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
       {loading && <p className="mt-4 text-sm text-zinc-500">Fetching live Gitee data...</p>}
 

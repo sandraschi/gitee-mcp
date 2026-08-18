@@ -29,9 +29,10 @@ See [docs/WRAPPEE.md](docs/WRAPPEE.md) for the full picture.
 
 ## Preview
 
-| Trending radar | Repo intel |
-|----------------|------------|
-| *(add docs/screenshots/trending.png after first run)* | *(add docs/screenshots/repo.png after first run)* |
+| Dashboard |
+|-----------|
+| ![Dashboard](docs/screenshots/dashboard.png) |
+*Dark-theme dashboard: humming radar hero, KPI cards, onboarding cue.*
 
 ## Quick Install
 

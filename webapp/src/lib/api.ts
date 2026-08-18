@@ -49,6 +49,8 @@ export interface RadarResponse {
     repos: RadarRepo[];
     total: number;
     dead_seeds: string[];
+    throttled_seeds: string[];
+    rate_limited: boolean;
     tier: string;
     generated_at: string;
   };
