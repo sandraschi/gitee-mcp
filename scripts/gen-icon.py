@@ -14,9 +14,9 @@ from pathlib import Path
 SIZE = 256
 OUT = Path(__file__).resolve().parents[1] / "assets" / "icon.png"
 
-BG = (20, 22, 30)        # dark slate
-GREEN = (198, 44, 44)    # gitee red accent
-FG = (240, 240, 244)     # near white
+BG = (20, 22, 30)  # dark slate
+GREEN = (198, 44, 44)  # gitee red accent
+FG = (240, 240, 244)  # near white
 
 
 def in_rect(x: int, y: int, x0: int, y0: int, x1: int, y1: int) -> bool:
@@ -55,6 +55,7 @@ def main() -> None:
         raw.append(0)  # filter type 0
         for x in range(SIZE):
             raw.extend(pixel(x, y))
+
     def chunk(tag: bytes, data: bytes) -> bytes:
         return (
             struct.pack(">I", len(data))
@@ -62,6 +63,7 @@ def main() -> None:
             + data
             + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
         )
+
     ihdr = struct.pack(">IIBBBBB", SIZE, SIZE, 8, 2, 0, 0, 0)
     png = (
         b"\x89PNG\r\n\x1a\n"

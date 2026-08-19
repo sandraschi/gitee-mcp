@@ -1,3 +1,4 @@
+import { API_BASE } from "@/lib/api";
 import { BookOpen } from "lucide-react";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -14,7 +15,7 @@ export default function Skills() {
   const [content, setContent] = useState("");
 
   useEffect(() => {
-    void fetch("http://127.0.0.1:11161/api/skills")
+    void fetch(`${API_BASE}/api/skills`)
       .then((r) => r.json())
       .then((b) => {
         setSkills(b.skills ?? []);
@@ -25,7 +26,7 @@ export default function Skills() {
 
   useEffect(() => {
     if (!selected) return;
-    void fetch(`http://127.0.0.1:11161/api/skills/${selected}`)
+    void fetch(`${API_BASE}/api/skills/${selected}`)
       .then((r) => r.text())
       .then(setContent)
       .catch(() => setContent(""));

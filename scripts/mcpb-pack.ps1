@@ -2,27 +2,43 @@
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
 $Pkg = "gitee_mcp"
-$Stage = Join-Path $Root "mcpb\src\$Pkg"
+$McpbDir = Join-Path $Root "mcpb"
+$Stage = Join-Path $McpbDir "src\$Pkg"
+
+# bun/bunx live in the user profile; PS 5.1 PATH may not include them after login.
+$env:PATH = "$env:USERPROFILE\.bun\bin;$env:PATH"
 
 Write-Host "=== gitee-mcp MCPB pack ===" -ForegroundColor Cyan
 
-# 1. Fresh stage: wipe + recopy (never pack a stale twin)
-if (Test-Path (Join-Path $Root "mcpb\src")) {
-    Remove-Item -Recurse -Force (Join-Path $Root "mcpb\src")
-    Write-Host "  wiped stale mcpb/src" -ForegroundColor Yellow
+# 1. Fresh stage: wipe the WHOLE mcpb/ dir first (never pack a stale twin; the
+#    mcpb CLI packs the cwd tree, so stale manifest/assets/pycache from prior
+#    runs would be bundled). Then rebuild it from scratch.
+if (Test-Path $McpbDir) {
+    Remove-Item -Recurse -Force $McpbDir
+    Write-Host "  wiped stale mcpb/" -ForegroundColor Yellow
 }
 New-Item -ItemType Directory -Force -Path (Split-Path $Stage) | Out-Null
-Copy-Item -Recurse -Force (Join-Path $Root "src\$Pkg") $Stage
-Write-Host "  staged src/$Pkg -> mcpb/src/$Pkg" -ForegroundColor Green
 
-# 2. Copy manifest + README + CHANGELOG if present
-Copy-Item (Join-Path $Root "manifest.json") (Join-Path $Root "mcpb\manifest.json") -Force
-Copy-Item (Join-Path $Root "assets") (Join-Path $Root "mcpb\assets") -Recurse -Force
-if (Test-Path (Join-Path $Root "README.md")) { Copy-Item (Join-Path $Root "README.md") (Join-Path $Root "mcpb\README.md") -Force }
-if (Test-Path (Join-Path $Root "CHANGELOG.md")) { Copy-Item (Join-Path $Root "CHANGELOG.md") (Join-Path $Root "mcpb\CHANGELOG.md") -Force }
+# robocopy excludes __pycache__ / *.pyc (tests and smoke runs leave bytecode in src/);
+# a raw Copy-Item would stage it and trip the pollution check below.
+robocopy (Join-Path $Root "src\$Pkg") $Stage /E /XD __pycache__ /XF "*.pyc" /NFL /NDL /NJH /NJS /NC /NS | Out-Null
+if ($LASTEXITCODE -ge 8) {
+    throw "robocopy failed to stage src/$Pkg (exit code $LASTEXITCODE)"
+}
+Write-Host "  staged src/$Pkg -> mcpb/src/$Pkg (pycache excluded)" -ForegroundColor Green
+
+# 2. Copy manifest + README + CHANGELOG + assets + .mcpbignore.
+#    .mcpbignore MUST be present in the mcpb/ cwd so the pack CLI applies the
+#    same exclusions (venv/node_modules/webapp/tests/glama.json/...) - without it
+#    the archive is packed with zero ignored files.
+Copy-Item (Join-Path $Root "manifest.json") (Join-Path $McpbDir "manifest.json") -Force
+Copy-Item (Join-Path $Root "assets") (Join-Path $McpbDir "assets") -Recurse -Force
+Copy-Item (Join-Path $Root ".mcpbignore") (Join-Path $McpbDir ".mcpbignore") -Force
+if (Test-Path (Join-Path $Root "README.md")) { Copy-Item (Join-Path $Root "README.md") (Join-Path $McpbDir "README.md") -Force }
+if (Test-Path (Join-Path $Root "CHANGELOG.md")) { Copy-Item (Join-Path $Root "CHANGELOG.md") (Join-Path $McpbDir "CHANGELOG.md") -Force }
 
 # 3. Verify no pollution under mcpb/
-$polluted = Get-ChildItem (Join-Path $Root "mcpb") -Recurse -Include "*.pyc", "__pycache__", "*.bak", "*.bak.*" -ErrorAction SilentlyContinue
+$polluted = Get-ChildItem $McpbDir -Recurse -Include "*.pyc", "__pycache__", "*.bak", "*.bak.*" -ErrorAction SilentlyContinue
 if ($polluted) {
     throw "mcpb/ contains pollution: $($polluted.FullName -join ', ') - aborting"
 }
@@ -42,8 +58,11 @@ if ($sys -lt 3000 -or $user -lt 4000 -or $ex -lt 100) {
 }
 Write-Host "  3-4-100 gate PASSED" -ForegroundColor Green
 
-# 5. Verify entry point imports from mcpb/src only
-$env:PYTHONPATH = Join-Path $Root "mcpb\src"
+# 5. Verify entry point imports from mcpb/src only.
+#    PYTHONDONTWRITEBYTECODE prevents the import check from dropping .pyc files
+#    into mcpb/src AFTER the pollution check (which would ship in the bundle).
+$env:PYTHONPATH = Join-Path $McpbDir "src"
+$env:PYTHONDONTWRITEBYTECODE = "1"
 $check = uv run python -c "import sys; sys.path.insert(0, r'$Stage\..'); import gitee_mcp.server; print('import OK')" 2>&1
 if ($LASTEXITCODE -ne 0) {
     throw "mcpb entry import failed: $check"
@@ -51,12 +70,12 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "  entry import OK" -ForegroundColor Green
 
 # 6. Pack
-Push-Location (Join-Path $Root "mcpb")
+Push-Location $McpbDir
 New-Item -ItemType Directory -Force -Path (Join-Path $Root "dist") | Out-Null
 bunx @anthropic-ai/mcpb pack . (Join-Path $Root "dist\gitee-mcp-v0.1.0.mcpb")
 if ($LASTEXITCODE -ne 0) { throw "mcpb pack failed" }
 Pop-Location
 
 # 7. Optional cleanup of staging
-Remove-Item -Recurse -Force (Join-Path $Root "mcpb\src") -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force $McpbDir -ErrorAction SilentlyContinue
 Write-Host "=== MCPB pack complete ===" -ForegroundColor Green

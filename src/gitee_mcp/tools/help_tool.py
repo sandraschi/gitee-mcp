@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from fastmcp import Context
 
+from ..errors import READ_ONLY
 from ..server_state import mcp
 
 _HELP = """# Gitee MCP
@@ -46,7 +47,7 @@ repo intel, and translate Chinese descriptions to English.
 """
 
 
-@mcp.tool(version="0.1.0")
+@mcp.tool(annotations=READ_ONLY, version="0.1.0")
 async def gitee_help(ctx: Context | None = None) -> dict:
     """Gitee MCP help - tools, tiers, configuration and tips.
 

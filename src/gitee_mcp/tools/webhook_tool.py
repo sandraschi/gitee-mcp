@@ -10,6 +10,7 @@ from fastmcp import Context
 from pydantic import Field
 
 from ..config import DATA_DIR
+from ..errors import MUTATING
 from ..server_state import mcp
 
 _WEBHOOK_DB = DATA_DIR / "webhook_events.jsonl"
@@ -60,7 +61,7 @@ def clear_events() -> int:
     return count
 
 
-@mcp.tool(version="0.1.0")
+@mcp.tool(annotations=MUTATING, version="0.1.0")
 async def gitee_webhook(
     operation: Annotated[
         Literal["list", "clear"],
@@ -101,7 +102,13 @@ async def gitee_webhook(
         }
         for e in events
     ]
-    return {"success": True, "operation": operation, "events": slim, "count": len(slim)}
+    return {
+        "success": True,
+        "operation": operation,
+        "events": slim,
+        "count": len(slim),
+        "message": f"{len(slim)} webhook event(s) in the feed",
+    }
 
 
 def _summarize(event: dict) -> str:

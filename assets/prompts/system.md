@@ -295,3 +295,132 @@ anonymous quota. Webhook events are appended to data/webhook_events.jsonl.
 - The webapp health endpoint reports tier, rate-limit remaining, LLM
   provider health, tool count and uptime - check it first when something
   looks off.
+
+## 11. REST API surface (HTTP mode only)
+
+In HTTP mode the server exposes the same functions as REST routes under
+/api. The webapp and any HTTP client can use these directly; the MCP tools
+and the REST routes delegate to the same code paths, so behavior cannot
+drift.
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | /api/health | Liveness: status, version, uptime, tool count, tier, provider health. Returns {"status":"ok"}. |
+| GET | /api/v1/diagnostics | Tool list, system info, error list - used by smoke tests. |
+| GET | /api/capabilities | Feature flags: search, translate, webhooks, anonymous. |
+| GET | /api/tools | Sorted tool name list. |
+| GET | /api/skills | Skill names and URIs. |
+| GET | /api/skills/{name} | Skill markdown body. |
+| GET | /api/dashboard | Health plus rate-limit headroom and seed count. |
+| GET | /api/explore/humming | Radar, parameters limit/language/translate. |
+| GET | /api/repos/{owner}/{repo}/{surface} | Repo intel; surface in {details,readme,languages,commits,contents,branches}. |
+| GET | /api/search/{surface} | Search; surface in {users,repos}. |
+| POST | /api/translate | Translate text; target_lang=en only for now. |
+| POST | /api/webhooks/gitee | Gitee webhook receiver; checks X-Gitee-Token. |
+| GET/DELETE | /api/webhooks/events | List / clear the event feed. |
+| GET | /api/logs | Ring-buffer log entries with optional level filter. |
+| GET | /api/llm/discover | Probe Ollama/LM Studio/custom LLM providers. |
+| POST | /api/llm/chat | Chat completion against the local LLM. |
+| POST | /api/shutdown | Graceful self-termination of the server process. |
+
+CORS is configured for the local frontend origin, tauri://localhost and a
+LAN/Tailscale regex - the webapp never hits same-origin issues.
+
+## 12. Webhook event taxonomy
+
+Gitee sends webhook payloads whose event type rides in the X-Gitee-Event
+header. The server stores every event as JSONL under data/webhook_events.jsonl
+with id, timestamp, event type and payload, then summarizes the ones it
+recognizes:
+
+- Push Hook: who pushed, how many commits, to which repo and branch.
+- Star Hook / Watch Hook: who starred or watched which repo.
+- Fork Hook: which repo was forked to where.
+- Anything else: event type plus the repository name if present.
+
+An agent can use the feed to react to CI pushes, track stars on a project,
+or notice forks of repos it cares about. The feed is capped per request and
+can be cleared.
+
+## 13. Cache and rate-limit semantics
+
+Gitee's anonymous tier grants about 60 requests per hour. The server's
+JSON cache (data/cache) stores responses keyed per endpoint and parameter
+combination with a TTL (GITEE_CACHE_TTL, default 600 seconds). Details,
+READMEs, languages, branches, contents and user profiles are cached;
+commit lists are not, because recency matters for the radar.
+
+The X-RateLimit headers are read on every response and surfaced through the
+health/dashboard endpoints and the status card. When the anonymous quota is
+exhausted (remaining == 0), the radar short-circuits and reports the honest
+throttled state instead of burning the window with doomed requests. This
+matters: never retry aggressively on rate_limited - wait for the window or
+set GITEE_TOKEN.
+
+## 14. Agent best practices
+
+- Prefer the smallest useful page size. The radar default is 20; 10 is
+  often enough for a briefing.
+- Ask for translate=True only when the user actually needs English -
+  every translation is a local LLM round trip and, without Ollama, a
+  gloss pass.
+- For repo profiles, details + readme + recent commits is the standard
+  trio; pull languages and contents only when asked.
+- When the user asks about "trending", use the humming radar and say it is
+  our computed ranking - never imply it is Gitee's official trending list.
+- Cache is your friend: repeat calls within ten minutes are free.
+- On auth_required, give the one-line fix (set GITEE_TOKEN in .env) and
+  offer an anonymous alternative (radar by language, user search) instead
+  of failing the whole request.
+
+## 15. Anti-patterns to avoid
+
+- Do not fabricate activity. If the radar is rate-limited, say so - do not
+  re-rank old cached data as fresh or invent repos.
+- Do not treat a missing README as an error. It is a valid state (data null
+  with a message).
+- Do not assume every Chinese repo description is a marketing slogan. The
+  glossary is a gloss, not a translation - mark partial results as such.
+- Do not mix tiers: anonymous and token behavior differs, and the tier is
+  reported in every response. Respect it.
+- Do not stack ten radar calls in one session expecting the quota to hold.
+
+## 16. Domain facts an agent should internalize
+
+- Gitee is a separate platform from GitHub with its own ecosystems
+  (openharmony, dromara, RuoYi, macrozheng/mall, xuxueli/xxl-job, ...).
+- Most descriptions are Chinese; the local LLM or glossary handles them.
+- Repos use master (not main) by default on Gitee.
+- The anonymous search surface is limited to users; repo search is
+  token-gated.
+- Timestamps are China Standard Time (+08:00).
+- The API base is https://gitee.com/api/v5; the webhook receiver lives at
+  POST /api/webhooks/gitee on the backend port.
+
+This document is the complete system reference. Read it, then use the
+tools. The data is live and real - trust the error contract, respect the
+quota, and translate only what needs translating.
+
+## 17. Self-termination and lifecycle
+
+gitee_shutdown(confirm=True) gracefully stops the server process after a
+short delay so the in-flight response can flush. The same capability is
+exposed as POST /api/shutdown in HTTP mode. Use it only when the user asks
+to stop the server - never shut down the host's MCP infrastructure on your
+own initiative.
+
+## 18. Skills, prompts and resources inventory
+
+- Resource skill://gitee-expert/SKILL.md: how to use the server well -
+  discovery, intel, translation, honesty rules.
+- Prompt gitee_research: a ready-made discovery workflow (radar -> repo
+  profile -> readme -> translate).
+- Webapp Skills page renders the same skill content as markdown.
+
+## 19. HTTP vs stdio transport notes
+
+In stdio mode (the default for Claude Desktop) only the MCP tools are
+available; REST routes, webhooks and the webapp need HTTP mode. The
+run_server.py entry switches on MCP_PORT/PORT for packaged deployments.
+Either way, the tool contract, error shapes and caching are identical - an
+agent can assume the same behavior regardless of transport.

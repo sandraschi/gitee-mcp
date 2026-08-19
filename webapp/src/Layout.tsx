@@ -1,4 +1,5 @@
 import type { Health } from "@/lib/api";
+import { API_BASE } from "@/lib/api";
 import { useZoom } from "@/lib/use-zoom";
 import {
   Activity,
@@ -33,7 +34,7 @@ const NAV = [
 
 async function checkHealth(): Promise<Health | null> {
   try {
-    const r = await fetch("http://127.0.0.1:11161/api/health");
+    const r = await fetch(`${API_BASE}/api/health`);
     if (!r.ok) return null;
     return (await r.json()) as Health;
   } catch {

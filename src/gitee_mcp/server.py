@@ -87,6 +87,21 @@ def skill_gitee_expert() -> str:
     return "Gitee MCP server skill: use gitee_explore for discovery, gitee_repo for intel, gitee_translate for zh->en."
 
 
+@mcp.prompt()
+def gitee_research() -> str:
+    """Discover what is humming on Gitee, profile a repo, and translate it to English."""
+    return (
+        "You are exploring the Chinese open-source ecosystem on Gitee.\n"
+        "1. Call gitee_explore(operation='humming', limit=10) to see what is active right now.\n"
+        "2. Pick a repo that looks interesting and call gitee_repo(operation='details', owner=..., repo=...), "
+        "then gitee_repo(operation='readme', ...) for its README.\n"
+        "3. If a description or README is in Chinese, call gitee_translate(operation='zh_to_en', text=...) "
+        "to gloss it via the local LLM (or the built-in glossary).\n"
+        "4. Prefer the anonymized anonymous tier and respect the ~60 requests/hour budget - "
+        "cache results and do not re-fetch the same repo twice in a session."
+    )
+
+
 class TranslateRequest(BaseModel):
     text: str
     target_lang: str = "en"
@@ -297,6 +312,20 @@ def build_app() -> FastAPI:
         if level:
             records = [r for r in records if r["level"] == level.upper()]
         return {"logs": records[-max(limit, 1) :], "count": len(records)}
+
+    @app.post("/api/shutdown", response_model=None)
+    def shutdown() -> dict:
+        """Graceful self-termination - stops the uvicorn server process."""
+        import threading
+
+        def _exit() -> None:
+            time.sleep(0.5)
+            import os
+
+            os._exit(0)
+
+        threading.Thread(target=_exit, daemon=True).start()
+        return {"success": True, "message": "gitee-mcp shutting down now."}
 
     @app.get("/api/llm/discover")
     def llm_discover() -> dict:

@@ -6,6 +6,12 @@ _bunpath := "$env:PATH = \"$env:USERPROFILE\\.bun\\bin;$env:PATH\""
 default:
     @just --list
 
+# One-time dev bootstrap: deps + pre-commit hook + webapp install
+bootstrap:
+    uv sync
+    uv run pre-commit install
+    {{_bunpath}}; cd webapp; bun install
+
 # Start the full stack (backend + webapp) with the fleet start script
 serve:
     ./start.ps1

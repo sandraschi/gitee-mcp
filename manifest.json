@@ -23,6 +23,7 @@
     { "name": "gitee_translate", "description": "Chinese to English translation via local LLM with gloss fallback" },
     { "name": "gitee_webhook", "description": "Inbound Gitee webhook event feed" },
     { "name": "gitee_help", "description": "Server help and configuration reference" },
+    { "name": "gitee_shutdown", "description": "Graceful self-termination of the server (confirm=True)" },
     { "name": "show_gitee_humming_card", "description": "Humming radar as a rich Prefab card" },
     { "name": "show_gitee_status_card", "description": "Server configuration status as a rich Prefab card" }
   ]

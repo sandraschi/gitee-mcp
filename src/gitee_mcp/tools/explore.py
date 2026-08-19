@@ -8,11 +8,34 @@ from fastmcp import Context
 from pydantic import Field
 
 from ..client import GiteeError, get_client
+from ..errors import READ_ONLY, error_response
 from ..radar import humming_radar
 from ..server_state import mcp
 
+_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "success": {"type": "boolean"},
+        "message": {"type": "string"},
+        "data": {
+            "type": "object",
+            "properties": {
+                "repos": {"type": "array"},
+                "total": {"type": "integer"},
+                "dead_seeds": {"type": "array"},
+                "throttled_seeds": {"type": "array"},
+                "tier": {"type": "string"},
+                "generated_at": {"type": "string"},
+            },
+        },
+        "error": {"type": "string"},
+        "error_type": {"type": "string"},
+        "suggestions": {"type": "array"},
+    },
+}
 
-@mcp.tool(version="0.1.0")
+
+@mcp.tool(annotations=READ_ONLY, output_schema=_OUTPUT_SCHEMA, version="0.1.0")
 async def gitee_explore(
     operation: Annotated[
         Literal["humming", "top_starred", "top_forked", "recommended", "refresh"],
@@ -113,12 +136,10 @@ async def gitee_explore(
             }
         return result
     except GiteeError as exc:
-        return {
-            "success": False,
-            "message": exc.message,
-            "error": exc.message,
-            "error_type": exc.error_type,
-            "suggestions": (
+        return error_response(
+            exc,
+            error_type=exc.error_type,
+            suggestions=(
                 [
                     "Set GITEE_TOKEN (free) for the full tier.",
                     "Run with translate=False to skip LLM translation.",
@@ -126,4 +147,5 @@ async def gitee_explore(
                 if exc.error_type == "auth_required"
                 else ["Check network connectivity to gitee.com."]
             ),
-        }
+            operation=operation,
+        )

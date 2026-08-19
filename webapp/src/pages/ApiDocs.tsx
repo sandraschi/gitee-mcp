@@ -68,10 +68,11 @@ export default function ApiDocs() {
         </a>
       </div>
 
-      <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
+      <div className="mt-3 flex gap-2 overflow-x-auto pb-2" data-testid="api-endpoints">
         {ENDPOINTS.map((e) => (
           <span
             key={e}
+            data-testid="api-endpoint-chip"
             className="shrink-0 rounded bg-zinc-800 px-2 py-1 font-mono text-[10px] text-zinc-400"
           >
             {e}

@@ -92,6 +92,20 @@ fake results.
 
 Static documentation.
 
+### gitee_shutdown
+
+Graceful self-termination: gitee_shutdown(confirm=True) stops the server
+after a short delay so the in-flight response can flush. Also exposed as
+POST /api/shutdown in HTTP mode.
+
+### Prompts
+
+- gitee_research: a ready-made discovery workflow (radar -> repo profile ->
+  readme -> translate).
+
+All tools carry READ_ONLY / MUTATING / DESTRUCTIVE annotations, an
+output_schema, and a {success, message, ...} dialogic return shape.
+
 ## REST surface (11161)
 
 GET /api/health, /api/v1/diagnostics, /api/capabilities, /api/tools,
@@ -99,8 +113,8 @@ GET /api/health, /api/v1/diagnostics, /api/capabilities, /api/tools,
 /api/repos/{owner}/{repo}/{surface}, /api/search/users, /api/search/repos,
 /api/translate/status, /api/webhooks/events, /api/logs,
 /api/llm/discover, /api/llm/providers; POST /api/translate,
-/api/llm/chat, /api/webhooks/gitee. /mcp for MCP streamable HTTP;
-/docs for Swagger UI.
+/api/llm/chat, /api/webhooks/gitee, /api/shutdown. /mcp for MCP streamable
+HTTP; /docs for Swagger UI.
 
 ## The humming radar methodology
 
@@ -146,10 +160,11 @@ network_error, validation) and suggestions (recovery steps).
 
 ## Testing and gates
 
-- just ci: ruff check, ruff format --check, pyright, pytest, tsc --noEmit,
-  biome check.
-- pytest: 17 cases with declared respx HTTP doubles (no live network).
+- just ci: ruff check, ruff format --check, pyright, pytest (with coverage
+  gate --cov-fail-under=60), tsc --noEmit, biome check.
+- pytest: 24 cases with declared respx HTTP doubles (no live network).
 - Playwright e2e: 12 cases (health, diagnostics, nav walk, radar, pages).
+- just bootstrap: uv sync + pre-commit install + webapp bun install.
 - just mcpb-pack: wipes+recopies mcpb/src, verifies 3-4-100 prompts,
   imports the staged entry, then packs.
 

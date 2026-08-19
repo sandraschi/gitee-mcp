@@ -1,13 +1,9 @@
-# Cursor rules for gitee-mcp
+---
+name: gitee-mcp
+description: Gitee bridge session context - humming radar, repo intel, search, zh->en translation. Load when exploring Chinese open-source activity.
+---
 
-- Backend: FastMCP 3.4.4+, portmanteau tools, `uv run python` only
-- Never fake data: anonymous repo search -> auth_required error
-- Radar uses real live commits/stars; Gitee trending is unscrapable
-- `just ci` before merge; ASCII-only scripts; no em dashes anywhere
-- One .env at repo root; secrets never in code
-- GITEE_TOKEN unlocks the search tier (free token, no CC)
-
-## Session Context (Gitee MCP)
+## Gitee MCP
 
 Bridge to Gitee (gitee.com), China's largest Chinese-language code hosting
 platform: live activity radar, repo intel, user/repo search and zh->en
@@ -20,3 +16,6 @@ translation via your local LLM.
 **At end of work, save insights:**
 - Offer a watchlist of interesting repos you found (radar + repo commits)
 - Respect the anonymous budget (~60 req/hour) - cache-aware, small limits
+
+Tools: gitee_explore, gitee_repo, gitee_search, gitee_translate,
+gitee_webhook, gitee_help, show_gitee_humming_card, show_gitee_status_card.

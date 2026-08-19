@@ -55,7 +55,11 @@ export default function Help() {
       </p>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {SECTIONS.map((s) => (
-          <div key={s.title} className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4">
+          <div
+            key={s.title}
+            data-testid={`help-section-${s.title.toLowerCase().replace(/\s+/g, "-")}`}
+            className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4"
+          >
             <h3 className="flex items-center gap-2 text-sm font-semibold text-amber-400">
               <s.icon className="h-4 w-4" /> {s.title}
             </h3>
@@ -71,6 +75,7 @@ export default function Help() {
         href="https://github.com/sandraschi/gitee-mcp"
         target="_blank"
         rel="noreferrer"
+        data-testid="help-repo-link"
         className="mt-6 inline-flex items-center gap-1.5 text-sm text-amber-400 hover:underline"
       >
         <Github className="h-4 w-4" /> github.com/sandraschi/gitee-mcp

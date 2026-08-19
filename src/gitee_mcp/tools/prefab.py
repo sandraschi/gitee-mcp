@@ -18,6 +18,7 @@ from prefab_ui.components import (
 
 from ..client import get_client
 from ..config import settings
+from ..errors import READ_ONLY
 from ..radar import humming_radar
 from ..server_state import mcp
 from ..translate import translator
@@ -34,7 +35,7 @@ def _kv(label: str, value: str) -> Row:
     )
 
 
-@mcp.tool(app=True, version="0.1.0")
+@mcp.tool(app=True, annotations=READ_ONLY, version="0.1.0")
 async def show_gitee_humming_card(
     limit: int = 10,
     translate: bool = False,
@@ -80,7 +81,7 @@ async def show_gitee_humming_card(
     return ToolResult(content=plain, structured_content=app)
 
 
-@mcp.tool(app=True, version="0.1.0")
+@mcp.tool(app=True, annotations=READ_ONLY, version="0.1.0")
 async def show_gitee_status_card(ctx: Context | None = None) -> ToolResult:
     """Show gitee-mcp configuration status as a rich in-chat card.
 

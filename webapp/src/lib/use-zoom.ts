@@ -35,9 +35,20 @@ export function useZoom() {
         return next;
       });
     };
+    const reset = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key.toLowerCase() === "0") {
+        e.preventDefault();
+        setZoomIndex(1);
+        void applyZoom(1.0);
+      }
+    };
     window.addEventListener("wheel", handler, { passive: false });
+    window.addEventListener("keydown", reset);
     const saved = localStorage.getItem("tauri-zoom");
     if (saved) void applyZoom(Number.parseFloat(saved));
-    return () => window.removeEventListener("wheel", handler);
+    return () => {
+      window.removeEventListener("wheel", handler);
+      window.removeEventListener("keydown", reset);
+    };
   }, [applyZoom]);
 }

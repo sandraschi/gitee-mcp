@@ -8,7 +8,9 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "tsc": "tsc --noEmit",
-    "test": "playwright test"
+    "test": "playwright test",
+    "biome:ci": "biome check src/",
+    "biome:fix": "biome check --write src/"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.2.0",

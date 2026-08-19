@@ -1,3 +1,4 @@
+import { API_BASE } from "@/lib/api";
 import { useLlmStore } from "@/store/llm";
 import { Download, Eraser, Send, Volume2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -66,8 +67,8 @@ export default function Chat() {
     (async () => {
       try {
         const [skills, content] = await Promise.all([
-          fetch("http://127.0.0.1:11161/api/skills").then((r) => r.json()),
-          fetch("http://127.0.0.1:11161/api/skills/gitee-expert").then((r) => r.text()),
+          fetch(`${API_BASE}/api/skills`).then((r) => r.json()),
+          fetch(`${API_BASE}/api/skills/gitee-expert`).then((r) => r.text()),
         ]);
         if (cancelled) return;
         setSkillName(skills.skills?.[0]?.name ?? "gitee-expert");
@@ -102,7 +103,7 @@ export default function Chat() {
     setMessages(next);
     setThinking(true);
     try {
-      const r = await fetch("http://127.0.0.1:11161/api/llm/chat", {
+      const r = await fetch(`${API_BASE}/api/llm/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -222,6 +223,8 @@ export default function Chat() {
               "Summarize the top Java repos from the radar.",
               "Which Chinese open-source projects do low-code?",
               "What did dromara commit this week?",
+              "Profile dromara/hutool and explain what it does.",
+              "Translate this to English: 企业级微服务快速开发框架",
             ].map((p) => (
               <button
                 type="button"

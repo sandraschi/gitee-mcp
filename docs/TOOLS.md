@@ -69,6 +69,17 @@ gitee_repo(operation="details", owner="dromara", repo="hutool")
 
 Static documentation covering tools, tiers, configuration, notes.
 
+## gitee_shutdown
+
+Graceful self-termination. `gitee_shutdown(confirm=True)` stops the server
+after a short delay so the in-flight response flushes. Also exposed as
+`POST /api/shutdown` in HTTP mode. Annotated DESTRUCTIVE.
+
+## Prompts
+
+- `gitee_research`: discovery workflow (radar -> repo profile -> readme ->
+  translate).
+
 ## REST surface (webapp backend)
 
 | Route | Purpose |
@@ -87,9 +98,10 @@ Static documentation covering tools, tiers, configuration, notes.
 | `POST /api/llm/chat` | Chat completion proxy |
 | `GET /api/llm/discover` | Ollama/LM Studio probe |
 | `POST /api/webhooks/gitee` | Webhook receiver (X-Gitee-Token check) |
+| `GET /api/logs` | Ring-buffer log tail (level filter) |
+| `POST /api/shutdown` | Graceful self-termination |
 | `GET /api/webhooks/events` | Webhook feed |
-| `GET /api/logs` | Ring-buffer log tail |
-| `POST /api/webhooks/events` (DELETE) | Clear webhook feed |
+| `DELETE /api/webhooks/events` | Clear webhook feed |
 | `/mcp` | MCP streamable HTTP |
 | `/docs` | Swagger UI |
 

@@ -12,9 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: astral-sh/setup-uv@v1
+      - uses: astral-sh/setup-uv@v3
         with:
           version: latest
+          enable-cache: true
 
       - name: Install Python deps
         run: uv sync
@@ -32,11 +33,13 @@ jobs:
         run: uv run pytest -q
 
       - name: Install Bun
-        run: powershell -Command "irm bun.sh/install.ps1 | iex"
+        uses: oven-sh/setup-bun@v2
+        with:
+          version: latest
 
       - name: Webapp install
         working-directory: webapp
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: TypeScript check
         working-directory: webapp
@@ -44,4 +47,4 @@ jobs:
 
       - name: Biome check
         working-directory: webapp
-        run: bunx biome check src/
+        run: bun run biome:ci

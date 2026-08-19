@@ -8,10 +8,25 @@ from fastmcp import Context
 from pydantic import Field
 
 from ..client import GiteeError, get_client
+from ..errors import READ_ONLY, error_response
 from ..server_state import mcp
 
+_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "success": {"type": "boolean"},
+        "operation": {"type": "string"},
+        "message": {"type": "string"},
+        "data": {"type": "array"},
+        "count": {"type": "integer"},
+        "error": {"type": "string"},
+        "error_type": {"type": "string"},
+        "suggestions": {"type": "array"},
+    },
+}
 
-@mcp.tool(version="0.1.0")
+
+@mcp.tool(annotations=READ_ONLY, output_schema=_OUTPUT_SCHEMA, version="0.1.0")
 async def gitee_search(
     operation: Annotated[
         Literal["users", "repos", "user_repos"],
@@ -62,7 +77,13 @@ async def gitee_search(
                 }
                 for u in data
             ]
-            return {"success": True, "operation": operation, "data": slim, "count": len(slim)}
+            return {
+                "success": True,
+                "operation": operation,
+                "data": slim,
+                "count": len(slim),
+                "message": f"Found {len(slim)} users matching '{query}'",
+            }
         if operation == "repos":
             _, items = client.search_repositories(query, sort=sort, per_page=limit)
             slim = [
@@ -77,7 +98,13 @@ async def gitee_search(
                 }
                 for r in items
             ]
-            return {"success": True, "operation": operation, "data": slim, "count": len(slim)}
+            return {
+                "success": True,
+                "operation": operation,
+                "data": slim,
+                "count": len(slim),
+                "message": f"Found {len(slim)} repos matching '{query}'",
+            }
         if operation == "user_repos":
             if not login:
                 return {
@@ -85,6 +112,7 @@ async def gitee_search(
                     "operation": operation,
                     "error": "login required for user_repos",
                     "error_type": "validation",
+                    "message": "login required for user_repos",
                 }
             data = client.user_repos(login, limit)
             slim = [
@@ -99,22 +127,28 @@ async def gitee_search(
                 }
                 for r in data
             ]
-            return {"success": True, "operation": operation, "data": slim, "count": len(slim)}
+            return {
+                "success": True,
+                "operation": operation,
+                "data": slim,
+                "count": len(slim),
+                "message": f"Listed {len(slim)} public repos for {login}",
+            }
         return {
             "success": False,
             "operation": operation,
             "error": f"unknown operation {operation}",
             "error_type": "validation",
+            "message": f"unknown operation {operation}",
         }
     except GiteeError as exc:
-        return {
-            "success": False,
-            "operation": operation,
-            "error": exc.message,
-            "error_type": exc.error_type,
-            "suggestions": (
+        return error_response(
+            exc,
+            error_type=exc.error_type,
+            operation=operation,
+            suggestions=(
                 ["Set GITEE_TOKEN (free, no CC) at gitee.com/profile/personal_access_tokens/new."]
                 if exc.error_type == "auth_required"
                 else []
             ),
-        }
+        )

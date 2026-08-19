@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "text",
+            "text": "## Gitee MCP\n\nBridge to Gitee (gitee.com), China's largest Chinese-language code hosting platform: live activity radar, repo intel, user/repo search and zh->en translation via your local LLM.\n\n**Before starting work:**\n1. Check what is humming: gitee_explore(operation=\"humming\", limit=10)\n2. Check status/tier: show_gitee_status_card() or gitee_help()\n\n**At end of work, save insights:**\n- Offer a watchlist of interesting repos you found (radar + repo commits)\n- Respect the anonymous budget (~60 req/hour) - cache-aware, small limits"
+          }
+        ]
+      }
+    ]
+  }
+}

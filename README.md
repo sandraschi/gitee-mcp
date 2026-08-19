@@ -95,6 +95,15 @@ All methods: [INSTALL.md](INSTALL.md).
   for translation
 - Optional: free Gitee token for repo search
 
+## Stack
+
+| Layer | Tech |
+|-------|------|
+| Backend | Python 3.11, FastMCP 3.4.4+ (MCP), FastAPI (REST), uvicorn, httpx, beautifulsoup4, Pydantic v2 |
+| Frontend | React 18, Vite 5, TypeScript, Tailwind CSS (dark), Zustand, Lucide, Framer Motion, react-router-dom, react-markdown |
+| Tooling | uv, just, ruff, pyright, pytest (+ pytest-cov, respx), Bun, Biome, Playwright |
+| Local LLM | Ollama (OpenAI-compatible `/v1`), default `qwen2.5:7b` |
+
 ## License
 
 MIT

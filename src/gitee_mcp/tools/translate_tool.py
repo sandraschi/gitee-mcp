@@ -7,11 +7,12 @@ from typing import Annotated, Literal
 from fastmcp import Context
 from pydantic import Field
 
+from ..errors import READ_ONLY
 from ..server_state import mcp
 from ..translate import is_chinese, translator
 
 
-@mcp.tool(version="0.1.0")
+@mcp.tool(annotations=READ_ONLY, version="0.1.0")
 async def gitee_translate(
     operation: Annotated[
         Literal["zh_to_en", "detect", "status"],
@@ -68,6 +69,7 @@ async def gitee_translate(
             "operation": operation,
             "error": "text is required for zh_to_en",
             "error_type": "validation",
+            "message": "text is required for zh_to_en",
         }
     result = translator.zh_to_en(text)
     return {
@@ -77,4 +79,9 @@ async def gitee_translate(
         "translated": result.get("translated", False),
         "translation": result.get("translation", ""),
         "note": result.get("note"),
+        "message": (
+            "Translated to English"
+            if result.get("translated")
+            else "Could not translate - gloss applied (see note)"
+        ),
     }

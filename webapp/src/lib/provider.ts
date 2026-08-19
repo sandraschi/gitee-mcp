@@ -1,5 +1,7 @@
 /** Local LLM provider probing (Ollama / LM Studio / custom) per SOTA webapp standard. */
 
+import { API_BASE } from "./api";
+
 export interface Provider {
   name: string;
   base: string;
@@ -15,7 +17,7 @@ export interface DiscoverResult {
 
 export async function discoverProviders(): Promise<DiscoverResult> {
   try {
-    const r = await fetch("http://127.0.0.1:11161/api/llm/discover");
+    const r = await fetch(`${API_BASE}/api/llm/discover`);
     if (!r.ok) return { providers: [], selected_provider: "", default_model: "" };
     return (await r.json()) as DiscoverResult;
   } catch {

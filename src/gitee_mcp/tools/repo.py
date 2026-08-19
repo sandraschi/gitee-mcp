@@ -8,10 +8,24 @@ from fastmcp import Context
 from pydantic import Field
 
 from ..client import GiteeError, get_client
+from ..errors import READ_ONLY, error_response
 from ..server_state import mcp
 
+_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "success": {"type": "boolean"},
+        "operation": {"type": "string"},
+        "message": {"type": "string"},
+        "data": {},
+        "error": {"type": "string"},
+        "error_type": {"type": "string"},
+        "suggestions": {"type": "array"},
+    },
+}
 
-@mcp.tool(version="0.1.0")
+
+@mcp.tool(annotations=READ_ONLY, output_schema=_OUTPUT_SCHEMA, version="0.1.0")
 async def gitee_repo(
     operation: Annotated[
         Literal["details", "readme", "languages", "commits", "contents", "branches"],
@@ -59,7 +73,12 @@ async def gitee_repo(
             data.pop("members", None)
             data.pop("programs", None)
             data.pop("enterprise", None)
-            return {"success": True, "operation": operation, "data": data}
+            return {
+                "success": True,
+                "operation": operation,
+                "data": data,
+                "message": f"Fetched {owner}/{repo_name} details",
+            }
         if operation == "readme":
             readme = client.repo_readme(owner, repo_name)
             if readme is None:
@@ -75,43 +94,52 @@ async def gitee_repo(
                 "operation": operation,
                 "data": readme[:max_chars],
                 "truncated": len(readme) > max_chars,
+                "message": f"README for {owner}/{repo_name} ({len(readme)} chars)",
             }
         if operation == "languages":
+            languages = client.repo_languages(owner, repo_name)
             return {
                 "success": True,
                 "operation": operation,
-                "data": client.repo_languages(owner, repo_name),
+                "data": languages,
+                "message": f"{len(languages)} languages for {owner}/{repo_name}",
             }
         if operation == "commits":
+            commits = client.repo_commits(owner, repo_name, limit)
             return {
                 "success": True,
                 "operation": operation,
-                "data": client.repo_commits(owner, repo_name, limit),
+                "data": commits,
+                "message": f"{len(commits)} recent commits for {owner}/{repo_name}",
             }
         if operation == "contents":
+            items = client.repo_contents(owner, repo_name, path)
             return {
                 "success": True,
                 "operation": operation,
-                "data": client.repo_contents(owner, repo_name, path),
+                "data": items,
+                "message": f"{len(items)} entries in {owner}/{repo_name}/{path or ''}",
             }
         if operation == "branches":
+            branches = [b.get("name") for b in client.repo_branches(owner, repo_name)]
             return {
                 "success": True,
                 "operation": operation,
-                "data": [b.get("name") for b in client.repo_branches(owner, repo_name)],
+                "data": branches,
+                "message": f"{len(branches)} branches for {owner}/{repo_name}",
             }
         return {
             "success": False,
             "error": f"unknown operation {operation}",
             "error_type": "validation",
+            "message": f"unknown operation {operation}",
         }
     except GiteeError as exc:
-        return {
-            "success": False,
-            "operation": operation,
-            "error": exc.message,
-            "error_type": exc.error_type,
-            "suggestions": (
+        return error_response(
+            exc,
+            error_type=exc.error_type,
+            operation=operation,
+            suggestions=(
                 ["Check the owner/repo spelling.", "Repos must be public for anonymous access."]
                 if exc.error_type == "not_found"
                 else [
@@ -119,4 +147,4 @@ async def gitee_repo(
                     "Retry after the rate window resets.",
                 ]
             ),
-        }
+        )

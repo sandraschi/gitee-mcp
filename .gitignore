@@ -41,6 +41,12 @@ data/
 *.db-wal
 *.sqlite3
 
+# Audit reports (regenerable snapshots - the .assess-fix-timestamp is the trail)
+reports/
+.coverage
+coverage.xml
+htmlcov/
+
 # Secrets
 .env
 .env.*

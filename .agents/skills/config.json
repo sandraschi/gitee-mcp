@@ -1,0 +1,10 @@
+{
+  "auto_load": ["session-start"],
+  "skills": {
+    "session-start": {
+      "name": "session-start",
+      "description": "Gitee MCP tool-awareness session prompt",
+      "path": "session-start/SKILL.md"
+    }
+  }
+}

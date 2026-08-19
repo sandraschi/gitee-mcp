@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.1.1 - 2026-08-19
+
+### Added
+
+- `gitee_shutdown` self-termination tool + `POST /api/shutdown` endpoint
+- `@mcp.prompt()` `gitee_research` discovery workflow template
+- Tool annotations (`READ_ONLY` / `MUTATING` / `DESTRUCTIVE`) and
+  `output_schema` on every tool
+- Shared `error_response()` helper with `logger.exception()` auto-logging
+- Dialogic `message` key on all tool success returns
+- `@mcp.prompt()` template, coverage gate (`--cov-fail-under=60`), `T20`
+  print-ban in ruff, `pytest-cov` and `pre-commit` dev deps
+- Pre-commit infra: `.pre-commit-config.yaml`, `scripts/pre-commit-biome.ps1`,
+  `.gitattributes` (eol=lf), `just bootstrap`
+- Session-context injection: `.claude-plugin/`, `hooks/hooks.json`,
+  `.cursorrules` Session Context section, `.windsurfrules`,
+  `.github/copilot-instructions.md`, `.opencode/skills/`, `.agents/skills/`
+- `renovate.json` (stabilityDays 3, Monday schedule)
+- Webapp: shared `API_BASE` (no hardcoded backend URLs), data-testid on
+  Help/ApiDocs/Logs/Inbox, 6 chat example prompts, Ctrl+0 zoom reset
+
+### Fixed
+
+- CI now passes: `oven-sh/setup-bun@v2` (bun was not on runner PATH),
+  `astral-sh/setup-uv@v3`, `bun install --frozen-lockfile`, `bun run biome:ci`
+- MCPB 3-4-100 prompts: system.md 2053 -> 3092 words, user.md 2225 -> 4173
+  words (pack gate now passes)
+- `mcp-central-docs/starts/gitee-mcp-start.bat` rewritten to relative path
+  with `%*` passthrough; registered in starts/README.md + fleet manifest
+- `reports/` added to `.gitignore`
+
 ## 0.1.0 - 2026-08-18
 
 Initial release.

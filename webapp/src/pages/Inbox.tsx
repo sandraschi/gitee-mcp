@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { API_BASE, api } from "@/lib/api";
 import { Bell, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -55,7 +55,7 @@ export default function Inbox() {
         <button
           type="button"
           onClick={() => {
-            void fetch("http://127.0.0.1:11161/api/webhooks/events", { method: "DELETE" })
+            void fetch(`${API_BASE}/api/webhooks/events`, { method: "DELETE" })
               .catch(() => {})
               .then(() => load());
           }}
@@ -69,9 +69,13 @@ export default function Inbox() {
         Push / star / fork events from Gitee repo webhooks hitting POST /api/webhooks/gitee.
       </p>
       {loading && <p className="mt-4 text-sm text-zinc-500">Loading...</p>}
-      <div className="mt-4 space-y-2">
+      <div className="mt-4 space-y-2" data-testid="inbox-events">
         {events.map((e) => (
-          <div key={e.id} className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-3">
+          <div
+            key={e.id}
+            data-testid="inbox-event"
+            className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-3"
+          >
             <div className="flex items-center gap-2 text-sm">
               <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] uppercase text-amber-400">
                 {e.event}

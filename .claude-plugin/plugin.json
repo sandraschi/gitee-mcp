@@ -1,0 +1,6 @@
+{
+  "name": "gitee-mcp",
+  "version": "0.1.0",
+  "description": "Gitee bridge - humming radar, repo intel, search, zh->en translation via local LLM",
+  "hooks": "../hooks/hooks.json"
+}
