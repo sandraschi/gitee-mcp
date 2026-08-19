@@ -75,10 +75,51 @@ Graceful self-termination. `gitee_shutdown(confirm=True)` stops the server
 after a short delay so the in-flight response flushes. Also exposed as
 `POST /api/shutdown` in HTTP mode. Annotated DESTRUCTIVE.
 
+## gitee_watchlist (v0.2)
+
+Persistent repo watchlist with change detection.
+
+| Op | Purpose |
+|----|---------|
+| `add` | Watch a repo (optional `min_activity` auto-follow threshold) |
+| `remove` | Stop watching |
+| `list` | Show watched repos |
+| `check` | Diff recent commits vs last check; report new activity |
+
+State persists in `data/watchlist.json`.
+
+## gitee_ecosystem (v0.2)
+
+Ecosystem intelligence.
+
+| Op | Purpose |
+|----|---------|
+| `graph` | Org / repo / fork-family graph (scope=seeds\|watchlist) |
+| `mirror` | Compare a repo against its GitHub twin (cached 1h) |
+| `digest` | Weekly "who's rising" narrative from radar history (writes `data/digest-latest.md`) |
+| `feed` | RSS 2.0 feed of the humming radar |
+
+## gitee_corpus (v0.2)
+
+README keyword corpus (RAG-lite, SQLite FTS5).
+
+| Op | Purpose |
+|----|---------|
+| `search` | BM25 keyword search over indexed READMEs |
+| `ingest` | Fetch + index one repo's README |
+| `status` | Indexed count + sample |
+
+READMEs are auto-indexed when fetched via `gitee_repo(readme)`.
+
 ## Prompts
 
 - `gitee_research`: discovery workflow (radar -> repo profile -> readme ->
   translate).
+- `gitee_weekly_brief`: weekly "who is rising" briefing from momentum +
+  digest.
+- `gitee_adoption_assessment`: velocity/mass/stack/docs verdict for one
+  project.
+- `gitee_compare_projects`: head-to-head comparison of two repos.
 
 ## REST surface (webapp backend)
 
@@ -102,6 +143,20 @@ after a short delay so the in-flight response flushes. Also exposed as
 | `POST /api/shutdown` | Graceful self-termination |
 | `GET /api/webhooks/events` | Webhook feed |
 | `DELETE /api/webhooks/events` | Clear webhook feed |
+| `GET /api/webhooks/digest` | Grouped webhook digest (since_hours) |
+| `GET /api/explore/momentum` | Top activity movers (7d delta) |
+| `GET /api/repos/{o}/{r}/stack` | Chinese-OSS tech-stack fingerprint |
+| `GET /api/repos/{o}/{r}/releases` | Latest releases + English summary |
+| `GET /api/repos/{o}/{r}/star-history` | Observed stars/forks/activity series |
+| `POST /api/translate/explain` | Culture notes (why it matters in CN OSS) |
+| `GET /api/watchlist` / `POST` / `DELETE` | Watchlist CRUD |
+| `POST /api/watchlist/check` | Watchlist change detection |
+| `GET /api/ecosystem/graph` | Org/repo/fork graph (scope=seeds\|watchlist) |
+| `GET /api/ecosystem/mirror/{o}/{r}` | GitHub mirror comparison |
+| `GET /api/ecosystem/digest` | Weekly narrative digest (days) |
+| `GET /api/feed.xml` | RSS 2.0 radar feed |
+| `GET /api/corpus/search` | README BM25 keyword search |
+| `GET /api/corpus/status` | Corpus index status |
 | `/mcp` | MCP streamable HTTP |
 | `/docs` | Swagger UI |
 

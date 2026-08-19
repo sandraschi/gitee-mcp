@@ -102,6 +102,56 @@ def gitee_research() -> str:
     )
 
 
+@mcp.prompt()
+def gitee_weekly_brief() -> str:
+    """Produce a weekly 'who is rising' briefing on Chinese OSS from radar history."""
+    return (
+        "You are compiling a weekly Chinese-OSS ecosystem briefing.\n"
+        "1. Call gitee_explore(operation='momentum', limit=15) for the top activity movers "
+        "over the last ~7 days.\n"
+        "2. For the 2-3 biggest movers, call gitee_repo(operation='details', ...) and "
+        "gitee_repo(operation='stack', ...) to explain WHY they are rising (what tech family).\n"
+        "3. Call gitee_ecosystem(operation='digest', days=7) for the generated narrative "
+        "(fall back to the template if it has no LLM polish).\n"
+        "4. Present a short brief: what rose, what slowed, and one insight about a tech family.\n"
+        "Note: momentum needs history - if the first call returns no movers, say the radar "
+        "needs a few days of runs and do not invent trends."
+    )
+
+
+@mcp.prompt()
+def gitee_adoption_assessment() -> str:
+    """Assess a Chinese-OSS project for adoption (velocity, mass, stack, docs)."""
+    return (
+        "You are assessing a Chinese open-source project for adoption.\n"
+        "1. Call gitee_repo(operation='details', owner=..., repo=...) for community mass "
+        "(stars/forks/watchers/issues) and last-push freshness.\n"
+        "2. Call gitee_repo(operation='commits', ...) for commit velocity.\n"
+        "3. Call gitee_repo(operation='stack', ...) to identify the tech family "
+        "(e.g. RuoYi admin framework, Spring Cloud microservices).\n"
+        "4. Call gitee_repo(operation='readme', ...) for positioning; translate the key "
+        "points with gitee_translate(operation='zh_to_en', ...).\n"
+        "5. Give a verdict with evidence: active/dormant, ecosystem fit, and risks "
+        "(license, single-maintainer, doc language). Never invent numbers - cite what the tools returned."
+    )
+
+
+@mcp.prompt()
+def gitee_compare_projects() -> str:
+    """Compare two Gitee projects head-to-head."""
+    return (
+        "You are comparing two Gitee projects. For each project:\n"
+        "1. gitee_repo(operation='details', ...) - stars/forks/watchers, last push.\n"
+        "2. gitee_repo(operation='commits', ...) - velocity.\n"
+        "3. gitee_repo(operation='stack', ...) - tech family.\n"
+        "4. gitee_repo(operation='readme', ...) - positioning; translate highlights with "
+        "gitee_translate(operation='zh_to_en', ...).\n"
+        "Then present a side-by-side table and a recommendation with evidence. "
+        "Optionally check gitee_ecosystem(operation='mirror', ...) to see where each "
+        "project's real community lives (Gitee vs GitHub)."
+    )
+
+
 class TranslateRequest(BaseModel):
     text: str
     target_lang: str = "en"
@@ -237,9 +287,23 @@ def build_app() -> FastAPI:
     ) -> dict | JSONResponse:
         from .tools.repo import gitee_repo
 
-        if surface not in ("details", "readme", "languages", "commits", "contents", "branches"):
+        if surface not in (
+            "details",
+            "readme",
+            "languages",
+            "commits",
+            "contents",
+            "branches",
+            "stack",
+            "releases",
+            "star-history",
+        ):
             return JSONResponse(
                 {"success": False, "error": f"unknown surface {surface}"}, status_code=400
+            )
+        if surface == "star-history":
+            return asyncio.run(
+                gitee_repo(operation="star_history", owner=owner, repo=repo, limit=limit)
             )
         return asyncio.run(
             gitee_repo(operation=surface, owner=owner, repo=repo, path=path, limit=limit)
@@ -344,6 +408,117 @@ def build_app() -> FastAPI:
         from .llm import chat_completion
 
         return chat_completion(req.messages, req.model or settings.llm_model)
+
+    # ------------------------------------------------ ecosystem intelligence
+
+    @app.get("/api/explore/momentum")
+    def explore_momentum(limit: int = 20) -> dict:
+        from .history import top_movers
+
+        movers = top_movers(days=7, limit=limit)
+        return {
+            "success": True,
+            "movers": movers,
+            "count": len(movers),
+            "note": "Deltas from gitee-mcp radar history - run humming over separate days to build baselines.",
+        }
+
+    @app.post("/api/translate/explain", response_model=None)
+    def translate_explain(req: TranslateRequest = Body(...)) -> dict:  # noqa: B008
+        from .culture import explain
+
+        return explain(req.text)
+
+    @app.get("/api/watchlist")
+    def watchlist_list() -> dict:
+        from .watchlist import list_entries
+
+        return {
+            "success": True,
+            "entries": [
+                {"full_name": e.full_name, "min_activity": e.min_activity, "added_at": e.added_at}
+                for e in list_entries()
+            ],
+        }
+
+    @app.post("/api/watchlist", response_model=None)
+    def watchlist_add(
+        full_name: str = Body(..., embed=True), min_activity: float | None = Body(None, embed=True)
+    ) -> dict:  # noqa: B008
+        from .watchlist import add
+
+        entry = add(full_name.strip("/"), min_activity=min_activity)
+        return {"success": True, "full_name": entry.full_name}
+
+    @app.delete("/api/watchlist/{full_name:path}")
+    def watchlist_remove(full_name: str) -> dict:
+        from .watchlist import remove
+
+        return {"success": True, "removed": remove(full_name.strip("/"))}
+
+    @app.post("/api/watchlist/check")
+    def watchlist_check() -> dict:
+        from .watchlist import check
+
+        return check()
+
+    @app.get("/api/ecosystem/graph")
+    def ecosystem_graph(scope: str = "seeds") -> dict:
+        from .ecosystem import build_graph
+
+        return build_graph(scope=scope)
+
+    @app.get("/api/ecosystem/mirror/{owner}/{repo}")
+    def ecosystem_mirror(owner: str, repo: str) -> dict:
+        from .ecosystem import mirror_compare
+
+        return mirror_compare(owner, repo)
+
+    @app.get("/api/ecosystem/digest")
+    def ecosystem_digest(days: int = 7) -> dict:
+        from .ecosystem import weekly_digest
+
+        result = weekly_digest(days=max(1, min(days, 30)))
+        return {
+            "success": True,
+            "days": result["days"],
+            "narrative": result["narrative"],
+            "movers": result["movers"],
+            "polished": result["polished"],
+        }
+
+    @app.get("/api/feed.xml")
+    def feed_xml() -> JSONResponse:
+        from .feed import build_feed
+
+        xml = build_feed()
+        return JSONResponse(
+            {"success": True, "feed_xml": xml, "content_type": "application/rss+xml"}
+        )
+
+    @app.get("/api/corpus/search")
+    def corpus_search(q: str = "", limit: int = 10) -> dict:
+        from .corpus import search
+
+        results = search(q, limit=max(1, min(limit, 50)))
+        return {"success": True, "results": results, "count": len(results)}
+
+    @app.get("/api/corpus/status")
+    def corpus_status() -> dict:
+        from .corpus import count, list_indexed
+
+        return {
+            "success": True,
+            "count": count(),
+            "indexed": list_indexed(limit=20),
+            "note": "BM25 keyword index (SQLite FTS5) - not embeddings.",
+        }
+
+    @app.get("/api/webhooks/digest")
+    def webhook_digest(since_hours: int = 24) -> dict:
+        from .tools.webhook_tool import digest_events
+
+        return digest_events(since_hours=since_hours)
 
     return app
 

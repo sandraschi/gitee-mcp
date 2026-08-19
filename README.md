@@ -25,6 +25,9 @@ See [docs/WRAPPEE.md](docs/WRAPPEE.md) for the full picture.
 - **Translation** - Chinese descriptions, issues and commits to English
   via Ollama (dictionary gloss fallback when no local model is running).
 - **Webhooks** - receive push/star/fork events and watch the feed.
+- **Ecosystem intelligence** - momentum deltas, a persistent watchlist
+  with change detection, a weekly "who's rising" digest, org/fork-family
+  graphs, GitHub mirror comparison and a README keyword corpus.
 - **Webapp** - dark-theme dashboard for all of the above (ports 11161/11162).
 
 ## Preview

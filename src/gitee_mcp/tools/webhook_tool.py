@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 from typing import Annotated, Literal
 from uuid import uuid4
 
@@ -61,29 +62,82 @@ def clear_events() -> int:
     return count
 
 
-@mcp.tool(annotations=MUTATING, version="0.1.0")
+def digest_events(since_hours: int = 24) -> dict:
+    """Group the event feed by repo and event type into a digest summary."""
+    since_hours = max(1, min(int(since_hours), 168))
+    events = list_events(200)
+    since_ts = time.time() - since_hours * 3600
+    recent = []
+    for e in events:
+        try:
+            ts = time.mktime(time.strptime(e.get("ts", ""), "%Y-%m-%dT%H:%M:%SZ"))
+        except ValueError:
+            continue
+        if ts >= since_ts:
+            recent.append(e)
+    by_repo: dict[str, dict] = {}
+    for e in recent:
+        payload = e.get("payload") or {}
+        repo = ((payload.get("repository") or {}).get("full_name")) or "unknown"
+        group = by_repo.setdefault(repo, {"count": 0, "summary": []})
+        group["count"] += 1
+        group["summary"].append(_summarize(e))
+    return {
+        "success": True,
+        "since_hours": since_hours,
+        "digest": [
+            {"repo": repo, "count": group["count"], "summary": group["summary"][:20]}
+            for repo, group in sorted(by_repo.items(), key=lambda kv: -kv[1]["count"])
+        ],
+        "event_count": len(recent),
+        "message": (
+            f"{len(recent)} event(s) in the last {since_hours}h across {len(by_repo)} repo(s)"
+        ),
+    }
+
+
+@mcp.tool(annotations=MUTATING, version="0.2.0")
 async def gitee_webhook(
     operation: Annotated[
-        Literal["list", "clear"],
-        Field(description="Operation: 'list' recent inbound webhook events, 'clear' wipes them."),
+        Literal["list", "clear", "digest"],
+        Field(
+            description=(
+                "Operation: 'list' recent inbound webhook events, 'clear' wipes "
+                "them, 'digest' groups events by repo and event type into a "
+                "daily-style summary (since_hours lookback)."
+            )
+        ),
     ],
     limit: Annotated[int, Field(description="Max events (1-50).", ge=1, le=50)] = 20,
+    since_hours: Annotated[int, Field(description="Digest lookback in hours.", ge=1, le=168)] = 24,
     ctx: Context | None = None,
 ) -> dict:
-    """Inspect inbound Gitee webhook events (push, star, fork, pull_request...).
+    """Inspect inbound Gitee webhook events or read a grouped daily digest.
 
     [RATIONALE]
     Gitee pushes events to POST /api/webhooks/gitee when a repo webhook is
     configured; this tool surfaces the captured feed so agents can react
-    to CI pushes, stars and forks.
+    to CI pushes, stars and forks - and 'digest' turns the raw feed into a
+    "what happened on my repos" report.
 
     ## Return Format
     {"success": bool, "operation": str, "events": [...], "count": int}
 
     ## Examples
     gitee_webhook(operation="list", limit=10)
+    gitee_webhook(operation="digest", since_hours=24)
     gitee_webhook(operation="clear")
     """
+    if operation == "digest":
+        result = digest_events(since_hours=since_hours)
+        return {
+            "success": True,
+            "operation": operation,
+            "since_hours": result["since_hours"],
+            "digest": result["digest"],
+            "event_count": result["event_count"],
+            "message": result["message"],
+        }
     if operation == "clear":
         cleared = clear_events()
         return {

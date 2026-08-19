@@ -71,7 +71,7 @@ test.describe("Fleet Audit", () => {
 
   test("Navigation sidebar walks all pages", async ({ page }) => {
     await page.goto(FE);
-    for (const label of ["Dashboard", "Trending", "Search", "Chat", "Skills", "Inbox", "API Docs", "Settings", "Logs", "Help"]) {
+    for (const label of ["Dashboard", "Trending", "Search", "Ecosystem", "Chat", "Skills", "Inbox", "API Docs", "Settings", "Logs", "Help"]) {
       await page.locator(`a[aria-label="${label}"]`).click();
       await page.waitForTimeout(600);
       expect(page.url()).not.toContain("undefined");
@@ -93,6 +93,12 @@ test.describe("Fleet Audit", () => {
   test("Logs page shows entries", async ({ page }) => {
     await page.goto(`${FE}/logs`);
     await expect(page.locator('[data-testid="logs-page"]')).toBeVisible();
+  });
+
+  test("Ecosystem page renders", async ({ page }) => {
+    await page.goto(`${FE}/ecosystem`);
+    await expect(page.locator('[data-testid="ecosystem-page"]')).toBeVisible();
+    await expect(page.locator('[data-testid="watchlist-input"]')).toBeVisible();
   });
 
   test("Help page renders", async ({ page }) => {

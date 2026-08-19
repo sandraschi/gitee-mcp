@@ -59,6 +59,10 @@ ci:
 mcpb-pack:
     pwsh.exe -NoProfile -ExecutionPolicy Bypass -File scripts/mcpb-pack.ps1
 
+# One-shot weekly ecosystem digest (writes data/digest-latest.md)
+digest:
+    uv run python -c "from gitee_mcp.ecosystem import weekly_digest; r = weekly_digest(days=7); print(r['narrative'][:2000]); print('--- written to data/digest-latest.md')"
+
 # Build the wheel
 build:
     uv build

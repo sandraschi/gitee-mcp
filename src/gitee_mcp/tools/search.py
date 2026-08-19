@@ -85,7 +85,10 @@ async def gitee_search(
                 "message": f"Found {len(slim)} users matching '{query}'",
             }
         if operation == "repos":
-            _, items = client.search_repositories(query, sort=sort, per_page=limit)
+            from ..search_expand import expand_repos_query
+
+            expanded = expand_repos_query(query)
+            _, items = client.search_repositories(expanded, sort=sort, per_page=limit)
             slim = [
                 {
                     "full_name": r.get("full_name", ""),
@@ -103,7 +106,10 @@ async def gitee_search(
                 "operation": operation,
                 "data": slim,
                 "count": len(slim),
-                "message": f"Found {len(slim)} repos matching '{query}'",
+                "message": (
+                    f"Found {len(slim)} repos matching '{query}'"
+                    + (f" (query expanded to '{expanded}')" if expanded != query else "")
+                ),
             }
         if operation == "user_repos":
             if not login:

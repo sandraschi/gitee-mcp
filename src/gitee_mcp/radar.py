@@ -19,6 +19,7 @@ import logging
 import time
 from typing import Any
 
+from . import history
 from .client import GiteeError, activity_score, get_client
 from .config import settings
 from .translate import is_chinese, translator
@@ -173,6 +174,25 @@ def humming_radar(
             logger.warning("Token mix skipped: %s", exc.message)
 
     results.sort(key=lambda r: r.get("activity_score", 0), reverse=True)
+
+    # Attach momentum deltas (vs previous snapshot + ~7d baseline) and
+    # persist this build so the next call has a baseline. First observation
+    # reports momentum: null - never a fabricated 0.
+    for item in results:
+        mom = history.momentum_for(
+            item["full_name"],
+            float(item.get("activity_score") or 0),
+            int(item.get("stargazers_count") or 0),
+            int(item.get("forks_count") or 0),
+        )
+        item["momentum"] = mom["momentum"]
+        item["momentum_7d"] = mom["momentum_7d"]
+        item["surge"] = mom["surge"]
+        item["stars_delta_7d"] = mom["stars_delta_7d"]
+        item["forks_delta_7d"] = mom["forks_delta_7d"]
+        item["momentum_observed_at"] = mom["observed_at"]
+    history.record_snapshot(results)
+
     message = f"Humming radar: {len(results)} repos"
     if throttled:
         message += f", {len(throttled)} seeds throttled by the anonymous rate limit"

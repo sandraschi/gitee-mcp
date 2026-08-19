@@ -131,6 +131,27 @@ function RepoCard({ repo }: { repo: RadarRepo }) {
             {repo.language}
           </span>
         )}
+        {repo.surge && (
+          <span
+            data-testid="surge-badge"
+            className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-amber-400"
+          >
+            ▲ surge
+          </span>
+        )}
+        {repo.momentum_7d !== null && repo.momentum_7d !== undefined && (
+          <span
+            data-testid="momentum-badge"
+            className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+              repo.momentum_7d >= 0
+                ? "bg-green-500/10 text-green-400"
+                : "bg-red-500/10 text-red-400"
+            }`}
+          >
+            {repo.momentum_7d >= 0 ? "+" : ""}
+            {repo.momentum_7d.toFixed(1)} 7d
+          </span>
+        )}
         <span className="ml-auto flex items-center gap-3 text-xs text-zinc-400">
           <span className="flex items-center gap-1">
             <Star className="h-3 w-3 text-amber-500" /> {repo.stargazers_count.toLocaleString()}

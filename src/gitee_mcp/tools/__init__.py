@@ -5,6 +5,8 @@ importing here during server boot is what actually registers the tools.
 """
 
 from . import (  # noqa: F401
+    corpus_tool,
+    ecosystem_tool,
     explore,
     help_tool,
     prefab,
@@ -12,5 +14,6 @@ from . import (  # noqa: F401
     search,
     shutdown_tool,
     translate_tool,
+    watchlist_tool,
     webhook_tool,
 )

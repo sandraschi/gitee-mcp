@@ -24,17 +24,42 @@ _OUTPUT_SCHEMA = {
     },
 }
 
+_REPO_OPS = (
+    "details",
+    "readme",
+    "languages",
+    "commits",
+    "contents",
+    "branches",
+    "stack",
+    "releases",
+    "star_history",
+)
 
-@mcp.tool(annotations=READ_ONLY, output_schema=_OUTPUT_SCHEMA, version="0.1.0")
+
+@mcp.tool(annotations=READ_ONLY, output_schema=_OUTPUT_SCHEMA, version="0.2.0")
 async def gitee_repo(
     operation: Annotated[
-        Literal["details", "readme", "languages", "commits", "contents", "branches"],
+        Literal[
+            "details",
+            "readme",
+            "languages",
+            "commits",
+            "contents",
+            "branches",
+            "stack",
+            "releases",
+            "star_history",
+        ],
         Field(
             description=(
                 "Operation: 'details' full metadata; 'readme' decoded README markdown "
-                "(None when absent); 'languages' byte/percent breakdown; 'commits' "
-                "recent commit list; 'contents' file/dir listing for a path; "
-                "'branches' branch list."
+                "(None when absent; also indexed into the local corpus); 'languages' "
+                "byte/percent breakdown; 'commits' recent commit list; 'contents' "
+                "file/dir listing for a path; 'branches' branch list; 'stack' "
+                "Chinese-OSS tech-stack fingerprint; 'releases' latest releases with "
+                "an English summary; 'star_history' observed stars/forks/activity "
+                "series from gitee-mcp radar history."
             )
         ),
     ],
@@ -61,6 +86,9 @@ async def gitee_repo(
     gitee_repo(operation="readme", owner="apache", repo="dubbo")
     gitee_repo(operation="commits", owner="macrozheng", repo="mall", limit=5)
     gitee_repo(operation="contents", owner="snailclimb", repo="JavaGuide", path="docs")
+    gitee_repo(operation="stack", owner="dromara", repo="hutool")
+    gitee_repo(operation="releases", owner="apache", repo="skywalking")
+    gitee_repo(operation="star_history", owner="macrozheng", repo="mall")
     """
     client = get_client()
     owner = owner.strip("/")
@@ -89,6 +117,10 @@ async def gitee_repo(
                     "message": f"{owner}/{repo_name} has no README",
                 }
             max_chars = 60000
+            # Local corpus auto-index (best-effort, never blocks the response).
+            from ..corpus import ingest as _ingest
+
+            _ingest(f"{owner}/{repo_name}", readme)
             return {
                 "success": True,
                 "operation": operation,
@@ -127,6 +159,52 @@ async def gitee_repo(
                 "operation": operation,
                 "data": branches,
                 "message": f"{len(branches)} branches for {owner}/{repo_name}",
+            }
+        if operation == "stack":
+            from ..stack import fingerprint
+
+            readme = client.repo_readme(owner, repo_name) or ""
+            contents = client.repo_contents(owner, repo_name)
+            details = client.repo_details(owner, repo_name)
+            result = fingerprint(
+                details.get("description") or "", readme, [c.get("name", "") for c in contents]
+            )
+            return {
+                "success": True,
+                "operation": operation,
+                "data": result,
+                "message": (f"Stack for {owner}/{repo_name}: {result['dominant'] or 'unknown'}"),
+            }
+        if operation == "releases":
+            from ..release_notes import summarize_latest
+
+            result = summarize_latest(owner, repo_name, limit=min(limit, 5))
+            return {
+                "success": result.get("success", True),
+                "operation": operation,
+                "data": {
+                    "summary": result.get("summary"),
+                    "translated": result.get("translated", False),
+                    "releases": result.get("releases", []),
+                },
+                "message": (
+                    f"{len(result.get('releases', []))} release(s) for {owner}/{repo_name}"
+                    if result.get("has_releases")
+                    else f"{owner}/{repo_name} has no releases on Gitee"
+                ),
+            }
+        if operation == "star_history":
+            from ..history import star_history
+
+            series = star_history(f"{owner}/{repo_name}", limit=min(limit, 30))
+            return {
+                "success": True,
+                "operation": operation,
+                "data": series,
+                "message": (
+                    f"{len(series)} observation(s) for {owner}/{repo_name} "
+                    "- from gitee-mcp radar history, not Gitee's full history"
+                ),
             }
         return {
             "success": False,

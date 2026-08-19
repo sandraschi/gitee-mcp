@@ -3,6 +3,7 @@ import Layout from "./Layout";
 import ApiDocs from "./pages/ApiDocs";
 import Chat from "./pages/Chat";
 import Dashboard from "./pages/Dashboard";
+import Ecosystem from "./pages/Ecosystem";
 import Help from "./pages/Help";
 import Inbox from "./pages/Inbox";
 import Logs from "./pages/Logs";
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/repo/:owner/:name" element={<Repo />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/skills" element={<Skills />} />
+        <Route path="/ecosystem" element={<Ecosystem />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/api-docs" element={<ApiDocs />} />
         <Route path="/settings" element={<Settings />} />

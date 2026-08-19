@@ -1,8 +1,8 @@
 {
   "manifest_version": "0.2",
   "name": "gitee-mcp",
-  "version": "0.1.0",
-  "description": "Gitee (Chinese GitHub) bridge - trending radar, repo intel, user/repo search and zh->en translation via local LLM",
+  "version": "0.2.0",
+  "description": "Gitee (Chinese GitHub) bridge - trending radar, momentum, repo intel, search, ecosystem graph, watchlist, corpus and zh->en translation via local LLM",
   "author": { "name": "Sandra Schipal" },
   "server": {
     "type": "python",
@@ -17,11 +17,14 @@
     }
   },
   "tools": [
-    { "name": "gitee_explore", "description": "Humming radar, top-starred/top-forked discovery, seed management" },
-    { "name": "gitee_repo", "description": "Repo details, readme, languages, commits, contents, branches" },
-    { "name": "gitee_search", "description": "Search users, repositories, user repos" },
-    { "name": "gitee_translate", "description": "Chinese to English translation via local LLM with gloss fallback" },
-    { "name": "gitee_webhook", "description": "Inbound Gitee webhook event feed" },
+    { "name": "gitee_explore", "description": "Humming radar, momentum deltas, top-starred/top-forked, seed management" },
+    { "name": "gitee_repo", "description": "Repo details, readme, languages, commits, contents, branches, stack, releases, star history" },
+    { "name": "gitee_search", "description": "Search users, repositories (cross-lingual expansion), user repos" },
+    { "name": "gitee_translate", "description": "Chinese to English translation, detect, provider status, culture explain" },
+    { "name": "gitee_webhook", "description": "Inbound Gitee webhook event feed + grouped digest" },
+    { "name": "gitee_watchlist", "description": "Persistent repo watchlist with change detection and auto-follow thresholds" },
+    { "name": "gitee_ecosystem", "description": "Ecosystem graph, GitHub mirror comparison, weekly digest, RSS feed" },
+    { "name": "gitee_corpus", "description": "README keyword corpus search (BM25 FTS5, RAG-lite)" },
     { "name": "gitee_help", "description": "Server help and configuration reference" },
     { "name": "gitee_shutdown", "description": "Graceful self-termination of the server (confirm=True)" },
     { "name": "show_gitee_humming_card", "description": "Humming radar as a rich Prefab card" },

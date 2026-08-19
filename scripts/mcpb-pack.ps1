@@ -5,6 +5,12 @@ $Pkg = "gitee_mcp"
 $McpbDir = Join-Path $Root "mcpb"
 $Stage = Join-Path $McpbDir "src\$Pkg"
 
+# Version from pyproject.toml (single source of truth) so the output name
+# never drifts from the manifest.
+$Version = (Select-String -Path (Join-Path $Root "pyproject.toml") -Pattern '^version = "([^"]+)"').Matches[0].Groups[1].Value
+if (-not $Version) { throw "could not read version from pyproject.toml" }
+$OutMcpb = Join-Path $Root "dist\gitee-mcp-v$Version.mcpb"
+
 # bun/bunx live in the user profile; PS 5.1 PATH may not include them after login.
 $env:PATH = "$env:USERPROFILE\.bun\bin;$env:PATH"
 
@@ -71,8 +77,8 @@ Write-Host "  entry import OK" -ForegroundColor Green
 
 # 6. Pack
 Push-Location $McpbDir
-New-Item -ItemType Directory -Force -Path (Join-Path $Root "dist") | Out-Null
-bunx @anthropic-ai/mcpb pack . (Join-Path $Root "dist\gitee-mcp-v0.1.0.mcpb")
+New-Item -ItemType Directory -Force -Path (Split-Path $OutMcpb) | Out-Null
+bunx @anthropic-ai/mcpb pack . $OutMcpb
 if ($LASTEXITCODE -ne 0) { throw "mcpb pack failed" }
 Pop-Location
 

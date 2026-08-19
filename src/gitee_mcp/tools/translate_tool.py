@@ -12,27 +12,32 @@ from ..server_state import mcp
 from ..translate import is_chinese, translator
 
 
-@mcp.tool(annotations=READ_ONLY, version="0.1.0")
+@mcp.tool(annotations=READ_ONLY, version="0.2.0")
 async def gitee_translate(
     operation: Annotated[
-        Literal["zh_to_en", "detect", "status"],
+        Literal["zh_to_en", "detect", "status", "explain"],
         Field(
             description=(
                 "Operation: 'zh_to_en' translates Chinese text to English via the "
                 "local LLM (honest fallback: dictionary gloss + untranslated flag "
                 "when no provider is reachable); 'detect' reports whether text is "
-                "Chinese; 'status' shows LLM provider health."
+                "Chinese; 'status' shows LLM provider health; 'explain' answers "
+                "'why does this matter in Chinese OSS' using the local LLM with a "
+                "built-in fact-sheet fallback."
             )
         ),
     ],
-    text: Annotated[str, Field(description="Text to translate or detect (max 1200 chars).")] = "",
+    text: Annotated[
+        str, Field(description="Text to translate, detect, or explain (max 1200 chars).")
+    ] = "",
     ctx: Context | None = None,
 ) -> dict:
-    """Translate Chinese text to English - repo descriptions, issues, commit messages.
+    """Translate Chinese to English, detect Chinese, check provider health, or explain Chinese-OSS context.
 
     [RATIONALE]
     The core value of a Gitee bridge for non-Chinese speakers is reading the
-    ecosystem; translation belongs next to discovery in the tool surface.
+    ecosystem; translation belongs next to discovery in the tool surface,
+    and 'explain' adds the cultural context translation cannot convey.
 
     ## Return Format
     {"success": bool, "operation": str, "translated": bool, "translation": str,
@@ -42,7 +47,26 @@ async def gitee_translate(
     gitee_translate(operation="zh_to_en", text="企业级微服务快速开发框架")
     gitee_translate(operation="detect", text="hello world")
     gitee_translate(operation="status")
+    gitee_translate(operation="explain", text="RuoYi")
     """
+    if operation == "explain":
+        from ..culture import explain
+
+        result = explain(text)
+        return {
+            "success": result.get("success", True),
+            "operation": operation,
+            "topic": text,
+            "explained": result.get("explained", False),
+            "explanation": result.get("explanation", ""),
+            "source": result.get("source", "fact-sheet"),
+            "note": result.get("note"),
+            "message": (
+                "Explained via local LLM"
+                if result.get("explained")
+                else "Explained via built-in fact sheet (LLM unreachable)"
+            ),
+        }
     if operation == "status":
         health = translator.provider_health(force=True)
         return {

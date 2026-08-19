@@ -1,5 +1,53 @@
 # Changelog
 
+## 0.2.0 - 2026-08-19
+
+### Added
+
+- **Radar momentum & history** (F1): every radar build persists snapshots;
+  repo entries now carry `momentum`, `momentum_7d`, `stars_delta_7d`,
+  `forks_delta_7d` and `surge` (honest null on first observation).
+  `gitee_explore(operation="momentum")` ranks by 7d activity delta.
+- **Tech-stack fingerprint** (F2): `gitee_repo(operation="stack")` detects
+  the Chinese-OSS stack (RuoYi, Spring Boot/Cloud, MyBatis-Plus, Vue2/3,
+  TDesign, Go, ...) from README + contents with confidence scoring.
+- **Cross-lingual search** (F3): repo search queries are expanded through
+  an EN->ZH synonym map ("low-code" also finds 低代码).
+- **Culture notes** (F4): `gitee_translate(operation="explain")` explains
+  "why this matters in Chinese OSS" via the local LLM with a labeled
+  fact-sheet fallback.
+- **Watchlist** (F5): new `gitee_watchlist` portmanteau (add/remove/list/
+  check) with commit-hash change detection and optional `min_activity`
+  auto-follow thresholds (data/watchlist.json).
+- **Release-notes summarizer** (F6): `gitee_repo(operation="releases")`
+  fetches Gitee releases and summarizes the latest to English.
+- **RSS radar feed** (F7): `GET /api/feed.xml` (RSS 2.0) +
+  `gitee_ecosystem(operation="feed")`.
+- **Ecosystem graph** (F9): `gitee_ecosystem(operation="graph")` maps orgs,
+  repos and fork families (scope=seeds|watchlist).
+- **GitHub mirror compare** (F10): `gitee_ecosystem(operation="mirror")`
+  compares a repo against its GitHub twin (cached 1h, honest "not found").
+- **Webhook digest** (F11): `gitee_webhook(operation="digest")` groups the
+  event feed by repo.
+- **Star-history curves** (F12): `gitee_repo(operation="star_history")`
+  returns the observed stars/forks/activity series; Trending cards show
+  momentum badges.
+- **README corpus** (F13): new `gitee_corpus` portmanteau (search/ingest/
+  status) over a SQLite FTS5 index; READMEs auto-index on fetch. Explicit
+  BM25 keyword retrieval (RAG-lite), not embeddings.
+- **Weekly digest** (F14): `gitee_ecosystem(operation="digest")` + `just
+  digest` write data/digest-latest.md from radar history deltas.
+- **New prompts**: `gitee_weekly_brief`, `gitee_adoption_assessment`,
+  `gitee_compare_projects`.
+- **Webapp Ecosystem page**: momentum movers, watchlist CRUD + check,
+  weekly digest renderer, ecosystem graph, GitHub mirror compare.
+
+### Spec-only (deferred, documented in SPEC.md)
+
+- F15 voice command bus (external speech-mcp infra)
+- F16 scheduled weekly auto-publish (fleet scheduler + sink publishing)
+- Embeddings RAG (needs local embedding runtime; FTS5 keyword search ships)
+
 ## 0.1.1 - 2026-08-19
 
 ### Added

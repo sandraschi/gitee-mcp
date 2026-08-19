@@ -39,6 +39,11 @@ export interface RadarRepo {
   watchers_count: number;
   pushed_at: string;
   activity_score: number;
+  momentum?: number | null;
+  momentum_7d?: number | null;
+  surge?: boolean;
+  stars_delta_7d?: number | null;
+  forks_delta_7d?: number | null;
   recent_commits: { sha: string; message: string; date: string; author: string }[];
 }
 
@@ -54,4 +59,62 @@ export interface RadarResponse {
     tier: string;
     generated_at: string;
   };
+}
+
+export interface Mover {
+  full_name: string;
+  delta: number;
+  current_score: number;
+  prev_score: number;
+  stars_delta: number;
+  forks_delta: number;
+}
+
+export interface WatchEntry {
+  full_name: string;
+  min_activity: number | null;
+  added_at: number;
+}
+
+export interface GraphNode {
+  id: string;
+  kind: "org" | "repo";
+  label: string;
+}
+
+export interface GraphEdge {
+  source: string;
+  target: string;
+  relation: string;
+}
+
+export interface DigestResult {
+  success: boolean;
+  days: number;
+  narrative: string;
+  movers: Mover[];
+  polished: boolean;
+}
+
+export interface MirrorResult {
+  success: boolean;
+  on_github: boolean;
+  owner: string;
+  repo: string;
+  github?: {
+    stargazers_count: number;
+    forks_count: number;
+    pushed_at: string;
+    description: string | null;
+    language: string | null;
+    html_url: string;
+  };
+  gitee?: {
+    stargazers_count: number | null;
+    forks_count: number | null;
+    pushed_at: string | null;
+  };
+  delta?: { stars: number | null; forks: number | null } | null;
+  note?: string;
+  error?: string;
 }

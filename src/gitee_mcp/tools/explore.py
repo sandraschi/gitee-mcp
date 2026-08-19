@@ -35,14 +35,23 @@ _OUTPUT_SCHEMA = {
 }
 
 
-@mcp.tool(annotations=READ_ONLY, output_schema=_OUTPUT_SCHEMA, version="0.1.0")
+@mcp.tool(annotations=READ_ONLY, output_schema=_OUTPUT_SCHEMA, version="0.2.0")
 async def gitee_explore(
     operation: Annotated[
-        Literal["humming", "top_starred", "top_forked", "recommended", "refresh"],
+        Literal[
+            "humming",
+            "momentum",
+            "top_starred",
+            "top_forked",
+            "recommended",
+            "refresh",
+        ],
         Field(
             description=(
                 "Operation: 'humming' derives a ranked live feed from real "
-                "commit/star/forks data of popular seed repos (works anonymously); "
+                "commit/star/forks data of popular seed repos (works anonymously) "
+                "and includes momentum deltas; 'momentum' ranks the same repos by "
+                "activity change over ~7 days (needs history, see note); "
                 "'top_starred' / 'top_forked' query repo search sorted by stars or "
                 "forks (requires GITEE_TOKEN); 'recommended' returns the seed list; "
                 "'refresh' re-verifies seed repos and drops dead ones."
@@ -75,11 +84,30 @@ async def gitee_explore(
     ## Examples
     gitee_explore(operation="humming", limit=10)
     gitee_explore(operation="humming", language="Python", translate=True)
+    gitee_explore(operation="momentum", limit=10)
     gitee_explore(operation="top_starred", limit=15)
     """
     try:
         if operation == "humming":
             result = humming_radar(limit=limit, language=language, translate=translate)
+        elif operation == "momentum":
+            from ..history import top_movers
+
+            movers = top_movers(days=7, limit=limit)
+            result = {
+                "success": True,
+                "message": (
+                    f"Top {len(movers)} movers by activity delta (7d) - "
+                    "first run needs history to build baselines"
+                    if movers
+                    else "No history yet - run humming over separate days to build momentum baselines"
+                ),
+                "data": {
+                    "movers": movers,
+                    "total": len(movers),
+                    "note": "Deltas from gitee-mcp radar history (our observations, not Gitee's full history).",
+                },
+            }
         elif operation in ("top_starred", "top_forked"):
             client = get_client()
             sort = "stargazers_count" if operation == "top_starred" else "forks_count"

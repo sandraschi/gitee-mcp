@@ -196,6 +196,15 @@ class GiteeClient:
         cache.set(key, items)
         return items
 
+    def repo_releases(self, owner: str, repo: str, limit: int = 5) -> list[dict]:
+        key = f"releases:{owner}/{repo}"
+        if (hit := cache.get(key)) is not None:
+            return hit[:limit]
+        data = self._request(f"repos/{owner}/{repo}/releases", {"per_page": min(limit, 20)})
+        releases = data if isinstance(data, list) else []
+        cache.set(key, releases)
+        return releases[:limit]
+
     def search_users(self, query: str, limit: int = 10) -> list[dict]:
         data = self._request("search/users", {"q": query, "per_page": min(limit, 100)})
         return data if isinstance(data, list) else []

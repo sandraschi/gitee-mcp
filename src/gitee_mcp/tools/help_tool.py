@@ -15,12 +15,16 @@ repo intel, and translate Chinese descriptions to English.
 
 ## Tools
 
-- `gitee_explore` - humming radar (anonymous), top-starred/top-forked (token), seeds
-- `gitee_repo` - details, readme, languages, commits, contents, branches
-- `gitee_search` - users (anonymous), repos (token), user repos (anonymous)
-- `gitee_translate` - zh -> en via local LLM, detect, provider status
-- `gitee_webhook` - inbound webhook event feed
+- `gitee_explore` - humming radar (anonymous), momentum deltas, top-starred/top-forked (token), seeds
+- `gitee_repo` - details, readme, languages, commits, contents, branches, stack, releases, star history
+- `gitee_search` - users (anonymous), repos (token, cross-lingual expansion), user repos
+- `gitee_translate` - zh -> en via local LLM, detect, provider status, culture explain
+- `gitee_webhook` - inbound webhook event feed + grouped digest
+- `gitee_watchlist` - persistent watchlist with change detection + auto-follow thresholds
+- `gitee_ecosystem` - ecosystem graph, GitHub mirror comparison, weekly digest, RSS feed
+- `gitee_corpus` - README keyword corpus search (BM25 FTS5, RAG-lite)
 - `show_gitee_humming_card` / `show_gitee_status_card` - rich in-chat cards
+- `gitee_shutdown` - graceful self-termination
 
 ## Tiers
 
