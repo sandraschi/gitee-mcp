@@ -64,3 +64,17 @@ To receive push/star/fork events:
 
 Events are appended to `data/webhook_events.jsonl` and visible via
 `gitee_webhook(operation="list")` and the webapp Inbox page.
+
+## Local data stores (v0.2, all gitignored and regenerable)
+
+| File | Written by | Purpose |
+|------|-----------|---------|
+| `data/cache/` | JsonCache | Gitee API response cache (TTL 600s) |
+| `data/radar_history.jsonl` | `history.py` | Radar snapshots -> momentum, star series, digest |
+| `data/watchlist.json` | `watchlist.py` | Persistent watchlist + change-detection state |
+| `data/corpus.db` | `corpus.py` | README BM25 index (SQLite FTS5, RAG-lite) |
+| `data/digest-latest.md` | `ecosystem.py` | Latest weekly digest narrative |
+| `data/webhook_events.jsonl` | webhook receiver | Inbound event log |
+
+None are needed for the server to run; deleting them only resets
+history/watchlist/corpus state.

@@ -40,7 +40,7 @@ See [docs/WRAPPEE.md](docs/WRAPPEE.md) for the full picture.
 ## Quick Install
 
 **Option A - drag and drop (Claude Desktop):** download
-`gitee-mcp-v0.1.0.mcpb` from
+`gitee-mcp-v0.2.0.mcpb` from
 [Releases](https://github.com/sandraschi/gitee-mcp/releases/latest) and
 drag it onto Claude Desktop. Works immediately in anonymous mode.
 
@@ -84,11 +84,12 @@ All methods: [INSTALL.md](INSTALL.md).
 | [Installation](INSTALL.md) | All install methods (A-D), prerequisites |
 | [Onboarding](docs/ONBOARDING.md) | Free Gitee token, tier comparison, pitfalls |
 | [Wrapped platform](docs/WRAPPEE.md) | Gitee overview, API quirks, community links |
-| [Architecture](docs/ARCHITECTURE.md) | Dual transport, REST surface, caching, ports |
-| [Configuration](docs/CONFIGURATION.md) | All env vars |
+| [Architecture](docs/ARCHITECTURE.md) | Dual transport, REST surface, caching, ecosystem layer, ports |
+| [Configuration](docs/CONFIGURATION.md) | All env vars, local data stores |
 | [Tool Reference](docs/TOOLS.md) | Every tool and operation |
 | [Development](docs/DEVELOPMENT.md) | Dev setup, tests, contributing |
 | [Troubleshooting](docs/TROUBLESHOOTING.md) | Common issues and fixes |
+| [Feature Spec](SPEC.md) | v0.2 ecosystem-intelligence spec (tiers, deferred) |
 
 ## Requirements
 

@@ -11,12 +11,16 @@ Bridge to Gitee (gitee.com), China's largest open-source platform: humming radar
 
 ## Tools
 
-- gitee_explore - humming radar, top-starred/top-forked, seeds
-- gitee_repo - details, readme, languages, commits, contents, branches
-- gitee_search - users (anonymous), repos (token), user repos
-- gitee_translate - zh->en via local LLM with gloss fallback
-- gitee_webhook - inbound event feed
+- gitee_explore - humming radar, momentum deltas, top-starred/top-forked, seeds
+- gitee_repo - details, readme, languages, commits, contents, branches, stack, releases, star history
+- gitee_search - users (anonymous), repos (token, cross-lingual), user repos
+- gitee_translate - zh->en via local LLM, detect, status, culture explain
+- gitee_webhook - inbound event feed + grouped digest
+- gitee_watchlist - persistent watchlist with change detection
+- gitee_ecosystem - ecosystem graph, GitHub mirror, weekly digest, RSS feed
+- gitee_corpus - README keyword corpus search (BM25 FTS5, RAG-lite)
 - show_gitee_humming_card / show_gitee_status_card - Prefab cards
+- gitee_shutdown - graceful self-termination
 
 ## Quick start
 

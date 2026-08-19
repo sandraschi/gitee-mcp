@@ -6,8 +6,9 @@
 | [INSTALL](../INSTALL.md) | All install methods, prerequisites |
 | [ONBOARDING](ONBOARDING.md) | First-timer: Gitee account + token, tiers, pitfalls |
 | [WRAPPEE](WRAPPEE.md) | What Gitee is, API quirks, community links |
-| [ARCHITECTURE](ARCHITECTURE.md) | System design, radar methodology, ports |
-| [CONFIGURATION](CONFIGURATION.md) | Env vars, webhook setup, seeds |
+| [ARCHITECTURE](ARCHITECTURE.md) | System design, radar methodology, ecosystem layer, ports |
+| [CONFIGURATION](CONFIGURATION.md) | Env vars, webhook setup, seeds, local data stores |
 | [TOOLS](TOOLS.md) | Full MCP tool + REST reference |
 | [DEVELOPMENT](DEVELOPMENT.md) | Dev setup, gates, tests |
 | [TROUBLESHOOTING](TROUBLESHOOTING.md) | Common issues |
+| [SPEC](../SPEC.md) | v0.2 ecosystem-intelligence feature spec (tiers, scope) |

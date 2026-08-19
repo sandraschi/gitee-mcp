@@ -68,3 +68,36 @@ for remote). Mirror the secret in `.env` as `GITEE_WEBHOOK_SECRET`.
 **Cause**: Stale `mcpb/src` staging twin
 **Fix**: Run `just mcpb-pack` - the script wipes and recopies `src/`
 before packing.
+
+## Momentum / digest says "no history yet"
+**Cause**: Momentum and the weekly digest need at least two radar builds on
+separate days to compute deltas
+**Fix**: Run the radar (Trending page or `gitee_explore(operation="humming")`)
+on different days. The first observation intentionally reports `momentum:
+null` rather than a fake 0.
+
+## Ecosystem graph shows few nodes
+**Cause**: The graph only includes seed + watchlist repos
+**Fix**: Add repos to the watchlist (`gitee_watchlist(add)` or the Ecosystem
+page) to grow the graph. Contributor-overlap edges are intentionally not
+included (they need the rate-heavy events API).
+
+## Mirror compare says "not found on GitHub"
+**Cause**: The project genuinely does not exist on GitHub (common for
+Gitee-only Chinese projects), not a bug
+**Fix**: Treat it as a signal: the project's community lives on Gitee only.
+
+## Corpus search returns no matches
+**Cause**: The README was never indexed (indexing happens when a README is
+fetched via `gitee_repo(operation="readme")` or `gitee_corpus(ingest)`)
+**Fix**: Run `gitee_corpus(operation="ingest", owner=..., repo=...)` for the
+repos you care about, or fetch their READMEs once.
+
+## Watchlist check says "error" for a repo
+**Cause**: Repo 404 (gone/private) or rate-limited at check time
+**Fix**: Verify the owner/repo spelling and tier; the entry stays in the
+watchlist and is retried next check.
+
+## `just digest` writes an empty brief
+**Cause**: Not enough radar history yet
+**Fix**: Same as the momentum case - run the radar on separate days first.

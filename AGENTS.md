@@ -1,16 +1,18 @@
 # gitee-mcp
 
 MCP server bridging **Gitee** (gitee.com), China's largest open-source
-platform: humming radar, repo intel, user/repo search, zh->en translation
-via local LLM, webhook feed. Backend FastMCP 3.4.4 + FastAPI on **11161**,
+platform: humming radar, momentum, repo intel, user/repo search, zh->en
+translation via local LLM, webhook feed, watchlist, ecosystem graph,
+GitHub mirror, README corpus. Backend FastMCP 3.4.4 + FastAPI on **11161**,
 React webapp on **11162**. Anonymous tier works out of the box (60 req/hr,
 cached); GITEE_TOKEN unlocks search.
 
 ## Reading order
 
-1. `docs/ARCHITECTURE.md` - design, radar methodology, tiers
+1. `docs/ARCHITECTURE.md` - design, radar methodology, ecosystem layer, tiers
 2. `docs/TOOLS.md` - full tool + REST reference
-3. `src/gitee_mcp/` - source map below
+3. `SPEC.md` - v0.2 ecosystem-intelligence feature spec (what/why/deferred)
+4. `src/gitee_mcp/` - source map below
 
 ## Directory map
 
@@ -24,9 +26,20 @@ src/gitee_mcp/
 ├── cache.py         JSON TTL cache (data/cache)
 ├── translate.py     zh->en via Ollama + glossary fallback
 ├── llm.py           provider probe + chat completion proxy
+├── history.py       radar snapshot history: momentum/star series/digest data (v0.2)
+├── watchlist.py     persistent watchlist + change detection (v0.2)
+├── stack.py         Chinese-OSS tech-stack fingerprint (v0.2)
+├── release_notes.py latest-release summarizer (v0.2)
+├── ecosystem.py     graph / GitHub mirror / weekly digest (v0.2)
+├── corpus.py        README BM25 index (SQLite FTS5, RAG-lite) (v0.2)
+├── feed.py          RSS 2.0 radar feed (v0.2)
+├── search_expand.py cross-lingual query expansion (v0.2)
+├── culture.py       "why it matters in CN OSS" explainer (v0.2)
+├── errors.py        shared error_response() + tool annotations
 ├── skills/          gitee-expert SKILL.md
 └── tools/           portmanteaus: explore, repo, search, translate_tool,
-                     webhook_tool, prefab, help_tool (imported in __init__)
+                     webhook_tool, watchlist_tool, ecosystem_tool,
+                     corpus_tool, prefab, help_tool, shutdown_tool
 ```
 
 ## Entry points
@@ -47,12 +60,13 @@ src/gitee_mcp/
 ## Gate commands
 
 ```powershell
-just ci          # ruff + pyright + pytest + tsc + biome
+just ci          # ruff + pyright + pytest (cov>=60) + tsc + biome
 just mcpb-pack   # fresh-stage bundle
+just digest      # one-shot weekly ecosystem digest
 ```
 
 ## Next (reading order)
 
 1. `src/gitee_mcp/client.py` - the API truth (what works anonymously)
-2. `src/gitee_mcp/tools/AGENTS.md` - tool layer details
-3. `webapp/AGENTS.md` - frontend structure
+2. `docs/TOOLS.md` - full tool + REST reference
+3. `docs/CONFIGURATION.md` - env vars + local data stores

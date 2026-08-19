@@ -39,11 +39,12 @@ mode is a fully functional real-data tier, not a mock.
 
 ```bash
 just serve      # full stack (start.ps1): backend 11161 + webapp 11162
-just test       # pytest
+just test       # pytest (coverage gate --cov-fail-under=60)
 just lint       # ruff check + format check
 just types      # pyright
 just tsc        # webapp TypeScript check
 just biome      # webapp Biome check
+just digest     # one-shot weekly ecosystem digest (writes data/digest-latest.md)
 just ci         # all gates locally
 just mcpb-pack  # fresh-stage MCPB bundle with 3-4-100 verification
 ```
@@ -61,10 +62,18 @@ just mcpb-pack  # fresh-stage MCPB bundle with 3-4-100 verification
 
 - `tests/test_gitee.py` - client/radar/translate units (respx doubles)
 - `tests/test_api.py` - REST surface via TestClient (respx doubles)
-- `webapp/e2e/fleet-audit.spec.ts` - Playwright: health, nav walk, radar
+- `tests/test_intelligence.py` - v0.2 ecosystem modules: history/momentum,
+  stack, search expansion, culture, watchlist, releases, feed, ecosystem
+  graph/mirror/digest, corpus (all offline, respx doubles)
+- `tests/test_intelligence_api.py` - v0.2 REST endpoints + tool registration
+- `webapp/e2e/fleet-audit.spec.ts` - Playwright: health, nav walk, radar,
+  ecosystem page
 
 Test doubles are declared: all HTTP mocking uses `respx` with explicit
-routes. No live-network tests, no hidden fakes.
+routes. No live-network tests, no hidden fakes. On-disk state (radar
+history, watchlist, corpus.db, cache) is cleared between tests via the
+autouse fixture in `tests/conftest.py`. Coverage gate: `--cov-fail-under=60`
+(the suite currently sits ~68%).
 
 ## Contributing
 

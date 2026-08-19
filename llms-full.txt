@@ -219,8 +219,10 @@ network_error, validation) and suggestions (recovery steps).
 
 - just ci: ruff check, ruff format --check, pyright, pytest (with coverage
   gate --cov-fail-under=60), tsc --noEmit, biome check.
-- pytest: 24 cases with declared respx HTTP doubles (no live network).
-- Playwright e2e: 12 cases (health, diagnostics, nav walk, radar, pages).
+- pytest: 51 cases with declared respx HTTP doubles (no live network),
+  coverage gate --cov-fail-under=60.
+- Playwright e2e: 13 cases (health, diagnostics, nav walk, radar, pages,
+  ecosystem page).
 - just bootstrap: uv sync + pre-commit install + webapp bun install.
 - just mcpb-pack: wipes+recopies mcpb/src, verifies 3-4-100 prompts,
   imports the staged entry, then packs.

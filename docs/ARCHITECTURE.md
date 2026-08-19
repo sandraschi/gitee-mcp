@@ -30,6 +30,13 @@ MCP clients (stdio/HTTP)┘      │  ├── /mcp        FastMCP streamable H
                                │  └── JsonCache (data/cache, TTL 600s)
                         Translator ──► Ollama :11434 (zh->en, gloss fallback)
                         WebhookReceiver (data/webhook_events.jsonl)
+
+                        Ecosystem layer (v0.2) - local persistence under data/
+                        history.py     radar snapshots -> momentum/star series (data/radar_history.jsonl)
+                        watchlist.py   persistent watchlist + change detection (data/watchlist.json)
+                        corpus.py      README BM25 index, SQLite FTS5 (data/corpus.db)
+                        ecosystem.py   graph / mirror / weekly digest (data/digest-latest.md)
+                        feed.py        RSS 2.0 radar feed
 ```
 
 Both the webapp and the MCP surface call the **same** tool functions
@@ -65,6 +72,30 @@ from live data:
 Methodology lives in `src/gitee_mcp/radar.py`; the score is exposed in
 every response so agents can verify the ranking.
 
+## Ecosystem intelligence (v0.2)
+
+The radar answers "what is humming now"; the ecosystem layer answers
+"what is changing". All of it is derived from real API calls or locally
+persisted observations - nothing is fabricated.
+
+| Module | Purpose | Storage |
+|--------|---------|---------|
+| `history.py` | Snapshot every radar build; compute `momentum` / `momentum_7d` / `surge`, observed star/forks series, and top movers for the digest | `data/radar_history.jsonl` (capped 2000 rows) |
+| `watchlist.py` | Persistent watchlist with commit-hash change detection + optional `min_activity` auto-follow thresholds | `data/watchlist.json` |
+| `stack.py` | Chinese-OSS tech-stack fingerprint (RuoYi, Spring Boot/Cloud, MyBatis-Plus, Vue2/3, TDesign, Go, ...) from README + contents | cached 10 min |
+| `release_notes.py` | Latest Gitee releases + English summary (LLM, glossary fallback) | cached 10 min |
+| `ecosystem.py` | Org/fork-family graph, GitHub mirror comparison (cached 1h), weekly "who's rising" digest | `data/digest-latest.md` |
+| `corpus.py` | README BM25 keyword index (SQLite FTS5, RAG-lite); READMEs auto-index on `gitee_repo(readme)` | `data/corpus.db` |
+| `feed.py` | RSS 2.0 radar feed (`GET /api/feed.xml`) | regenerated per request |
+| `search_expand.py` | Cross-lingual repo-search query expansion (EN->ZH synonym map) | static |
+
+Honesty rules enforced across the layer: momentum is `null` on the first
+observation (no fabricated 0); star-history and the digest are labeled as
+*gitee-mcp observations*, not Gitee's full history; the GitHub mirror
+returns "not found" for Gitee-only projects; the corpus is explicitly BM25
+keyword retrieval, not embeddings. The full feature spec lives in
+`SPEC.md`.
+
 ## Translation
 
 - Probe `GET {base}/models` (default Ollama on 11434)
@@ -83,7 +114,8 @@ every response so agents can verify the ranking.
 - `POST /api/webhooks/gitee` verifies `X-Gitee-Token` against
   `GITEE_WEBHOOK_SECRET` (when set), appends to
   `data/webhook_events.jsonl`
-- `gitee_webhook(operation=list|clear)` + webapp Inbox read the feed
+- `gitee_webhook(operation=list|clear|digest)` + webapp Inbox read the
+  feed; `digest` groups events by repo into a daily-style report
 
 ## Ports
 

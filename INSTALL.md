@@ -21,7 +21,7 @@ Install these if you don't have them already:
 ## Option A - Drag and Drop (Recommended)
 
 1. Go to [Releases](https://github.com/sandraschi/gitee-mcp/releases/latest)
-2. Download `gitee-mcp-v0.1.0.mcpb`
+2. Download `gitee-mcp-v0.2.0.mcpb`
 3. Open Claude Desktop -> drag the file onto the window
    *Or*: Settings -> MCP Servers -> Install from file
 
