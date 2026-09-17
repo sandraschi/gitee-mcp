@@ -22,6 +22,11 @@ target/
 native/target/
 web_sota/src-tauri/target/
 gen/
+src-tauri/resources/*-backend.exe
+src-tauri/resources/.env.example
+
+# CUA smoke test screenshots/reports (regenerated per run)
+cua-reports/
 
 # Build output
 dist/

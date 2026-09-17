@@ -50,7 +50,20 @@ export default function Layout() {
   const [backendOk, setBackendOk] = useState<boolean | null>(null);
   const [tier, setTier] = useState("anonymous");
   const location = useLocation();
-  useZoom();
+  const { zoomPercent } = useZoom();
+  const [restarting, setRestarting] = useState(false);
+
+  const restartBackend = useCallback(async () => {
+    setRestarting(true);
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("start_backend");
+    } catch {
+      /* not in Tauri - nothing to restart from the webapp shell */
+    } finally {
+      setRestarting(false);
+    }
+  }, []);
 
   const refresh = useCallback(async () => {
     const h = await checkHealth();
@@ -152,6 +165,20 @@ export default function Layout() {
           </div>
           <div className="mt-1 text-[10px] uppercase tracking-wide text-zinc-600">
             tier: <span className="text-amber-500">{tier}</span>
+          </div>
+          {backendOk === false && (
+            <button
+              type="button"
+              onClick={() => void restartBackend()}
+              disabled={restarting}
+              data-testid="restart-backend"
+              className="mt-2 w-full rounded border border-red-800 bg-red-950/40 py-1 text-[11px] text-red-300 hover:bg-red-900/40 disabled:opacity-50"
+            >
+              {restarting ? "Restarting..." : "Restart Backend"}
+            </button>
+          )}
+          <div className="mt-1 text-[10px] text-zinc-600" data-testid="zoom-indicator">
+            zoom: {zoomPercent}%
           </div>
         </div>
       </aside>

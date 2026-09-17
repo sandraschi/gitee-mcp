@@ -24,6 +24,9 @@ dev = [
     "respx>=0.21",
     "ruff>=0.5",
     "pyright>=1.1.370",
+    "pyinstaller>=6.0.0",
+    "pefile>=2023.2.7",
+    "altgraph>=0.17.4",
 ]
 
 [build-system]

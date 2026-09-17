@@ -1,0 +1,31 @@
+{
+  "product_name": "Gitee MCP",
+  "install_dir": "%LOCALAPPDATA%\\Gitee MCP",
+  "operator_exe": "gitee-mcp-native.exe",
+  "backend_process_names": ["gitee-mcp-native", "gitee-mcp-backend"],
+  "backend_port": 11161,
+  "health_path": "/api/health",
+  "diagnostics_path": "/api/v1/diagnostics",
+  "feature_smoke_path": "/api/health",
+  "window_title_re": "Gitee MCP",
+  "nsis_glob": "src-tauri/target/release/bundle/nsis/Gitee MCP_*_x64-setup.exe",
+  "bridge_ok_text": "Gitee MCP",
+  "uninstall_registry_filter": "*Gitee*MCP*",
+  "nav_routes": [
+    ["Dashboard", "Dashboard"],
+    ["Trending", "Trending"],
+    ["Search", "Search"],
+    ["Ecosystem", "Ecosystem"],
+    ["Chat", "Chat"],
+    ["Skills", "Skills"],
+    ["Inbox", "Inbox"],
+    ["API Docs", "API Docs"],
+    ["Settings", "Settings"],
+    ["Logs", "Logs"],
+    ["Help", "Help"]
+  ],
+  "sidebar_click_x": 30,
+  "sidebar_first_y": 90,
+  "sidebar_step_y": 40,
+  "log_file_paths": ["%LOCALAPPDATA%\\Gitee MCP\\backend-spawn.log"]
+}

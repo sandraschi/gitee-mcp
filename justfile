@@ -67,6 +67,18 @@ digest:
 build:
     uv build
 
+# Build PyInstaller backend sidecar + Tauri NSIS installer
+build-native:
+    Remove-Item 'dist\\gitee-mcp-backend.exe' -Force -ErrorAction SilentlyContinue
+    .venv\\Scripts\\pyinstaller.exe gitee-mcp-backend.spec --distpath dist --clean --noconfirm
+    powershell.exe -NoProfile -Command "Copy-Item 'dist\\gitee-mcp-backend.exe' 'src-tauri\\resources\\gitee-mcp-backend.exe' -Force"
+    {{_bunpath}}; cd webapp; bun install; bun run build
+    cd src-tauri; npx @tauri-apps/cli build --bundles nsis
+
+# CUA smoke test of the installed NSIS app (requires scripts/cua-smoke.py + scripts/cua-nsis-config.json)
+cua-nsis-test:
+    uv run python scripts/cua-smoke.py --config scripts/cua-nsis-config.json
+
 # Quick stdio smoke test of the MCP server
 smoke:
     uv run python -c "import asyncio; from gitee_mcp.server_state import mcp; import gitee_mcp.tools; print('tools:', len(asyncio.run(mcp.list_tools())))"

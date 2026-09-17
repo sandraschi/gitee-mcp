@@ -95,18 +95,62 @@ pub fn materialize_backend(app: &AppHandle) -> Result<PathBuf, String> {
     Ok(bundled)
 }
 
+#[cfg(windows)]
+fn port_is_free(port: u16) -> bool {
+    use std::net::TcpStream;
+    TcpStream::connect(("127.0.0.1", port)).is_err()
+}
+
 fn free_port(port: u16) {
     #[cfg(windows)]
     {
-        let script = format!(
+        // Layer 1: Stop-Process on the owning PID(s).
+        let stop_script = format!(
+            "Get-NetTCPConnection -LocalPort {port} -ErrorAction SilentlyContinue \
+            | ForEach-Object {{ Stop-Process -Id `$_.OwningProcess -Force -ErrorAction SilentlyContinue }}"
+        );
+        let _ = Command::new("powershell.exe")
+            .args(["-NoProfile", "-Command", &stop_script])
+            .stdout(Stdio::null()).stderr(Stdio::null())
+            .status();
+        thread::sleep(Duration::from_millis(500));
+
+        if port_is_free(port) {
+            return;
+        }
+
+        // Layer 2: plain taskkill by PID.
+        let taskkill_script = format!(
             "Get-NetTCPConnection -LocalPort {port} -ErrorAction SilentlyContinue \
             | ForEach-Object {{ taskkill /F /PID `$_.OwningProcess /T 2>$null }}"
         );
         let _ = Command::new("powershell.exe")
-            .args(["-NoProfile", "-Command", &script])
+            .args(["-NoProfile", "-Command", &taskkill_script])
             .stdout(Stdio::null()).stderr(Stdio::null())
             .status();
         thread::sleep(Duration::from_millis(500));
+
+        if port_is_free(port) {
+            return;
+        }
+
+        // Layer 3: UAC-elevated taskkill for processes we don't own.
+        let elevated_script = format!(
+            "Get-NetTCPConnection -LocalPort {port} -ErrorAction SilentlyContinue \
+            | ForEach-Object {{ Start-Process taskkill -ArgumentList '/F','/PID',`$_.OwningProcess,'/T' -Verb RunAs -WindowStyle Hidden -ErrorAction SilentlyContinue }}"
+        );
+        let _ = Command::new("powershell.exe")
+            .args(["-NoProfile", "-Command", &elevated_script])
+            .stdout(Stdio::null()).stderr(Stdio::null())
+            .status();
+
+        // Layer 4: poll up to 240s for the port to actually free.
+        for _ in 0..120 {
+            if port_is_free(port) {
+                return;
+            }
+            thread::sleep(Duration::from_millis(2000));
+        }
     }
 }
 
@@ -137,6 +181,7 @@ pub fn spawn_backend(app: AppHandle, state: &BackendProcess) -> Result<String, S
     let mut command = Command::new(&backend_path);
     command
         .current_dir(&workdir)
+        .args(["--mode", "http", "--host", "127.0.0.1", "--port", &BACKEND_PORT.to_string()])
         .env(ENV_PORT, BACKEND_PORT.to_string())
         .env(ENV_HOST, "127.0.0.1")
         .env(ENV_TAURI, "1")
@@ -167,7 +212,25 @@ pub fn spawn_backend(app: AppHandle, state: &BackendProcess) -> Result<String, S
         thread::spawn(move || watch_backend_stream(err, app_handle));
     }
 
+    // Second confirmation independent of the log-line match: poll the TCP port.
+    {
+        let app_handle = app.clone();
+        thread::spawn(move || poll_backend_health(app_handle, BACKEND_PORT));
+    }
+
     Ok(format!("Backend starting on port 11161"))
+}
+
+fn poll_backend_health(app: AppHandle, port: u16) {
+    use std::net::TcpStream;
+    for _ in 0..30 {
+        if TcpStream::connect(("127.0.0.1", port)).is_ok() {
+            let _ = app.emit("backend-status", "ready");
+            return;
+        }
+        thread::sleep(Duration::from_secs(2));
+    }
+    log_line(&app, "health poll: backend did not open port within 60s");
 }
 
 fn watch_backend_stream<R: std::io::Read + Send + 'static>(stream: R, app: AppHandle) {
@@ -183,5 +246,3 @@ fn watch_backend_stream<R: std::io::Read + Send + 'static>(stream: R, app: AppHa
         }
     }
 }
-
-
