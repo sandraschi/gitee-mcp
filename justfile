@@ -57,7 +57,7 @@ ci:
 
 # Bundle for Claude Desktop (MCPB) - MUST wipe+recopy src -> mcpb/src first
 mcpb-pack:
-    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "D:\Dev\repos\mcp-central-docs\scripts\make-mcpb.ps1" -RepoPath "{{REPO}}"
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "D:\Dev\repos\mcp-central-docs\scripts\make-mcpb.ps1" -RepoPath "{{justfile_directory()}}"
 
 # One-shot weekly ecosystem digest (writes data/digest-latest.md)
 digest:
@@ -78,6 +78,19 @@ build-native:
 # CUA smoke test of the installed NSIS app (requires scripts/cua-smoke.py + scripts/cua-nsis-config.json)
 cua-nsis-test:
     uv run python scripts/cua-smoke.py --config scripts/cua-nsis-config.json
+
+# One command: pre-flight checks -> build -> genuine CUA verification.
+tauri: tauri-preflight build-native cua-nsis-test
+
+# Fails fast if pywinauto/pyinstaller aren't real project deps (both caused
+# silent false passes fleet-wide on 2026-09-17 -- see mcp-central-docs
+# HANDOVER.md). Seconds, not a multi-minute Rust compile, to catch it.
+tauri-preflight:
+    @echo "== Tauri pre-flight checks =="
+    uv run python -c "import pywinauto"; if ($LASTEXITCODE -ne 0) { Write-Error "FATAL: pywinauto not importable -- run: uv add --dev pywinauto pillow pytesseract"; exit 1 }
+    if (-not (Test-Path '.venv\Scripts\pyinstaller.exe')) { Write-Error "FATAL: pyinstaller missing from project venv -- run: uv add --dev pyinstaller pefile altgraph"; exit 1 }
+    $gi = Get-Content .gitignore -Raw -ErrorAction SilentlyContinue; if ($gi -notmatch 'resources.*\.exe') { Write-Warning "gitignore may not cover resources/*.exe" }; if ($gi -notmatch 'cua-reports') { Write-Warning "gitignore may not cover cua-reports/" }
+    @echo "== Pre-flight OK =="
 
 # Quick stdio smoke test of the MCP server
 smoke:
