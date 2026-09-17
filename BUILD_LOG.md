@@ -63,3 +63,13 @@ PASS (>= 1 MB).
 
 - Did not commit these changes (not asked to).
 - Did not add `pytz`, `jsonschema`, `joserfc`, `h11`, `beartype`, `websockets`, `cachetools` as real dependencies — grepped `src/` and confirmed none are actually imported; they're stale/generic entries in the PyInstaller spec's `hiddenimports` list carried over from a shared template and can be pruned in a follow-up if desired.
+
+## 2026-09-17 (later same day) — CUA re-verification: original pass was FALSE
+
+**Discovery**: the original "11/11 phases passed" run above was a false pass. `pywinauto` was never a project dependency, so `cua_available()` returned `False` and every GUI-driven phase (window verify, screenshot, WebView bridge OCR, nav click-through) was **silently skipped** — the script still printed "ALL PHASES PASSED" because the summary logic only failed the run on a *fatal* phase failure, not on non-fatal skips. No mouse ever moved during the original run.
+
+**Fix**: added `pywinauto>=0.6.9`, `pillow>=12.3.0`, `pytesseract>=0.3.13` as dev dependencies (`uv add --dev`). Synced the fleet-template's fixed `cua-smoke.py` (`CUA_SMOKE_VERSION` 5 -> 6, which now refuses to print "ALL PHASES PASSED" when pywinauto is missing or any phase failed).
+
+**Genuine re-run result: 11/11 phases actually passed**, with real mouse automation (warning banner fired, cursor moved) and OCR-verified nav-walk of all 11 sidebar pages. The app itself is solid — only the test infrastructure was broken.
+
+See `mcp-central-docs/standards/rules/cua_nsis_smoke_testing.md` for the fleet-wide pitfall writeup — every other Tauri repo's prior "CUA pass" should be treated as unverified until re-run with pywinauto genuinely installed.

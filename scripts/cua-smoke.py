@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """CUA smoke test for NSIS-installed fleet apps (pywinauto-mcp canary).
 
-CUA_SMOKE_VERSION = 4
+CUA_SMOKE_VERSION = 6
 If this file differs from templates/tauri-native/scripts/cua-smoke.py in
 mcp-central-docs, copy the template over — version number will have changed.
 
@@ -60,7 +60,7 @@ def load_config(path: str | None = None) -> dict:
     return {k: _expand(v) for k, v in cfg.items()}
 
 
-CUA_SMOKE_VERSION = 4  # bump when template changes; see docstring
+CUA_SMOKE_VERSION = 6  # bump when template changes; see docstring
 
 
 def _check_version():
@@ -106,7 +106,11 @@ NSIS_GLOB = cfg(
     "web_sota/src-tauri/target/release/bundle/nsis/Pywinauto MCP Operator_*_x64-setup.exe",
 )
 REGISTRY_FILTER = cfg("uninstall_registry_filter", "*Pywinauto*")
-MAX_RETRY = 10
+# 60s budget: a freshly-installed PyInstaller onefile backend exe triggers a
+# fresh Windows Defender real-time scan on top of onefile self-extraction to
+# %TEMP%\_MEI*, measured ~35-40s cold; the old 30s budget declared FATAL
+# while the backend was still healthy (see TRAPS_AND_PITFALLS.md).
+MAX_RETRY = 20
 RETRY_DELAY = 3
 
 _INSTALLED = False
@@ -688,6 +692,12 @@ def main():
     print(f"  CUA Smoke Test — {PRODUCT_NAME}")
     print(f"{'=' * 50}\n")
 
+    if not _HAS_PYWAUTO:
+        print("  !!! WARNING: pywinauto is not importable in this venv. !!!")
+        print("  !!! Every GUI-driven phase will be SILENTLY SKIPPED.   !!!")
+        print("  !!! Run: uv add --dev pywinauto pillow pytesseract     !!!")
+        print("  !!! This run cannot verify the UI actually works.\n")
+
     try:
         for is_fatal, name, fn in phases:
             print(f"  Phase {phases.index((is_fatal, name, fn)) + 1}: {name}")
@@ -710,10 +720,19 @@ def main():
 
     print(f"{'=' * 50}")
     print(f"  Result: {passed}/{passed + failed} phases passed")
+    if not _HAS_PYWAUTO:
+        print("  WARNING: pywinauto was NOT importable in this venv — every GUI-driven")
+        print("  phase (window verify, screenshot, WebView OCR, nav click-through) was")
+        print("  SILENTLY SKIPPED, not verified. This run does NOT prove the UI works.")
+        print("  Fix: add pywinauto, pillow, pytesseract as dev dependencies and re-run.")
     if failed:
         print(f"  {failed} phase(s) FAILED")
     if fatal_failed:
         print("  FATAL phase failure — see above")
+        sys.exit(1)
+    if failed or not _HAS_PYWAUTO:
+        print("  NOT ALL PHASES PASSED — do not report this run as a clean pass")
+        print(f"{'=' * 50}\n")
         sys.exit(1)
     print("  ALL PHASES PASSED")
     print(f"{'=' * 50}\n")
