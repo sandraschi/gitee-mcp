@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased - 2026-09-17
+
+### Fixed
+
+- assfix pass: `start.ps1` standalone-mode frontend launch ignored
+  `fleet-start.config.ps1`'s `Frontend.PackageManager` and always ran
+  `npm run dev`, even though the webapp ships `bun.lock` and CI uses bun.
+  Naked installs (no `mcp-central-docs` engine available) now honor `bun` vs
+  `npm` per the config; `fleet-start.config.ps1` corrected to `PackageManager
+  = 'bun'`.
+- Added `data-testid` coverage to `Skills.tsx` (`skill-content`) and
+  `Repo.tsx` (`repo-tab-content`) to meet the fleet per-page testid bar.
+- Removed stray untracked `justfile.bak_*` debris from a prior batch edit.
+
 ## 0.2.0 - 2026-08-19
 
 ### Added

@@ -57,7 +57,7 @@ ci:
 
 # Bundle for Claude Desktop (MCPB) - MUST wipe+recopy src -> mcpb/src first
 mcpb-pack:
-    pwsh.exe -NoProfile -ExecutionPolicy Bypass -File scripts/mcpb-pack.ps1
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "D:\Dev\repos\mcp-central-docs\scripts\make-mcpb.ps1" -RepoPath "{{REPO}}"
 
 # One-shot weekly ecosystem digest (writes data/digest-latest.md)
 digest:

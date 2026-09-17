@@ -183,7 +183,7 @@ export default function Repo() {
         ))}
       </div>
 
-      <div className="mt-3">
+      <div className="mt-3" data-testid="repo-tab-content">
         {activeTab === "readme" && (
           <div className="prose-dark max-w-none rounded-lg border border-zinc-800 bg-zinc-900/50 p-5">
             {readme ? (

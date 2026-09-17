@@ -60,7 +60,10 @@ export default function Skills() {
           ))}
         </div>
       </div>
-      <div className="prose-dark min-h-[60vh] rounded-lg border border-zinc-800 bg-zinc-900/50 p-5">
+      <div
+        data-testid="skill-content"
+        className="prose-dark min-h-[60vh] rounded-lg border border-zinc-800 bg-zinc-900/50 p-5"
+      >
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>
     </div>
