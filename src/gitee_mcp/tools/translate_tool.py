@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Annotated, Literal
 
 from fastmcp import Context
@@ -52,7 +53,7 @@ async def gitee_translate(
     if operation == "explain":
         from ..culture import explain
 
-        result = explain(text)
+        result = await asyncio.to_thread(explain, text)
         return {
             "success": result.get("success", True),
             "operation": operation,

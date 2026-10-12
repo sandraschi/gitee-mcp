@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Annotated, Literal
 
 from fastmcp import Context
@@ -178,7 +179,9 @@ async def gitee_repo(
         if operation == "releases":
             from ..release_notes import summarize_latest
 
-            result = summarize_latest(owner, repo_name, limit=min(limit, 5))
+            result = await asyncio.to_thread(
+                summarize_latest, owner, repo_name, limit=min(limit, 5)
+            )
             return {
                 "success": result.get("success", True),
                 "operation": operation,

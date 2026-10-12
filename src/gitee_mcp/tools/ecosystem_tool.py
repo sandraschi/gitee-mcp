@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Annotated, Literal
 
 from fastmcp import Context
@@ -74,10 +75,10 @@ async def gitee_ecosystem(
                 "error_type": "validation",
                 "message": "owner and repo are required for mirror",
             }
-        result = ecosystem.mirror_compare(owner, repo)
+        result = await asyncio.to_thread(ecosystem.mirror_compare, owner, repo)
         return {"success": result.get("success", False), "operation": operation, **result}
     if operation == "digest":
-        result = ecosystem.weekly_digest(days=days)
+        result = await asyncio.to_thread(ecosystem.weekly_digest, days=days)
         return {
             "success": True,
             "operation": operation,
